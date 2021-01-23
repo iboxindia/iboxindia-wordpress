@@ -25,11 +25,13 @@ function ibx_wp_get_request_uri() {
 }
 // $base_url = "https://iboxindia.com/wordpress";
 
-function ibx_wp_postman_get($uri='/', $params=[]) {
+function ibx_wp_postman_get($uri='', $params=[]) {
+  $params['json']=true;
   $settings = IBX_WP::get_option( "settings" );
-  $base_url = "https://jsonplaceholder.typicode.com";
+  $base_url = "https://wordpress.iboxindia.com/packages";
   $curl = curl_init();
   $url = $base_url . $uri . '?' . http_build_query($params);
+  // echo $url;
   curl_setopt_array($curl, array(
     CURLOPT_URL => $url,
     CURLOPT_RETURNTRANSFER => true,
@@ -50,11 +52,19 @@ function ibx_wp_postman_get($uri='/', $params=[]) {
     //Only show errors while testing
     //echo "cURL Error #:" . $err;
     $response = array(
-      'Error' => $err
+      'error' => $err
     );
   } else {
-    $response = json_decode($response, true);
+    $tempResponse = json_decode($response, true);
+    if($tempResponse['statusCode'] == 200) {
+      $response = $tempResponse['data'];
+    } else {
+      $response = array(
+        'error' => $tempResponse
+      );
+    }
   }
+  if( isset( $response['error'] ) ) { return false; }
   return $response;
 }
 function ibx_wp_postman_post() {

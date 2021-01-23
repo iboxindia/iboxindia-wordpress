@@ -18,14 +18,16 @@
 
   // $plugins_base_uri='/plugins';
 
-  
+  $params=[];
   if ( isset ( $_GET['tab'] ) && $_GET['tab'] == 'plugins' ) {
     $tab = $_GET['tab']; 
     $existing_items = get_plugins();
-    $base_uri='/photos';
+    $base_uri='';
+    $params['type']='plugin';
   } else {
     $existing_items = wp_get_themes();
-    $base_uri='/photos';
+    $base_uri='';
+    $params['type']='theme';
   }
 
   function ibx_wp_admin_tabs( $current = 'themes' ) { 
@@ -56,21 +58,21 @@
       ?>
       <div class="ibx-item" tabindex="0" >
         <div class="ibx-item-screenshot">
-          <img src="<?php echo $item['thumbnailUrl']; ?>" alt="<?php echo $item['title']; ?>">
-          </div>
-    			<div class="update-message notice inline notice-warning notice-alt">
-          <?php if ( $existing_item != null ) { ?>
+          <img src="<?php echo $item['thumbnail_url']; ?>" alt="<?php echo $item['name']; ?>">
+        </div>
+        <?php if ( $existing_item != null ) { ?>
+          <div class="update-message notice inline notice-warning notice-alt">
             <p>
 					    Installed. 
               <?php if ( $existing_item['ver'] < $item['ver'] ) { ?>
                 <button class="button-link" type="button">Update now</button>				
               <?php } ?>
 			      </p>
-          <?php } ?>
-        </div>
+          </div>
+        <?php } ?>
 	      <div class="ibx-item-container">
-          <h2 class="ibx-item-name" id="<?php //echo $item['slug']; ?>">
-            <?php echo $item['title']; ?>
+          <h2 class="ibx-item-name" id="<?php echo $item['slug']; ?>">
+            <?php echo $item['name']; ?>
           </h2>
           <?php if ( $existing_item == null ) { ?>
   		      <div class="ibx-item-actions">
@@ -89,8 +91,11 @@
 		<?php ibx_wp_admin_tabs( $tab ); ?>
     <div class="ibx-items-browser">
       <?php
-        $items = ibx_wp_postman_get( $base_uri );
-        render_items_array ( $items, $existing_items );
+        $items = ibx_wp_postman_get( $base_uri, $params );
+        // var_dump( $items );
+        if( $items ) {
+          render_items_array ( $items, $existing_items );
+        }
         // switch ( $tab ){
         //   case 'plugins' : 
         //     render_items_array ( $plugins, $all_plugins );
