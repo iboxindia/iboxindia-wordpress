@@ -1,14 +1,11 @@
 <?php
-/**
- * Admin Notices
- *
- * @since 2.3.7
- * @package Iboxindia
- */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+// require_once WPCF7_PLUGIN_DIR . '/admin/includes/admin-functions.php';
+// require_once WPCF7_PLUGIN_DIR . '/admin/includes/help-tabs.php';
+// require_once WPCF7_PLUGIN_DIR . '/admin/includes/tag-generator.php';
+// require_once WPCF7_PLUGIN_DIR . '/admin/includes/welcome-panel.php';
+// require_once WPCF7_PLUGIN_DIR . '/admin/includes/config-validator.php';
+
 
 if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 
@@ -116,7 +113,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 		 */
 		public static function notice_assets() {
 			$file = is_rtl() ? 'ibx-wp-notices-rtl.css' : 'ibx-wp-notices.css';
-			wp_enqueue_style( 'ibx-wp-notices', IBX_WP_PLUGIN_URL . 'assets/css/' . $file, array(), IBX_WP_PLUGIN_VER );
+			wp_enqueue_style( 'ibx-wp-notices', IBX_WP_PLUGIN_URL . '/assets/css/' . $file, array(), IBX_WP_PLUGIN_VER );
 		}
 	}
 
@@ -126,3 +123,37 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 	Iboxindia_WP_Admin::get_instance();
 
 endif;
+
+add_action( 'admin_init', 'ibx_wp_admin_init', 10, 0 );
+
+function ibx_wp_admin_init() {
+	$settings = IBX_WP::get_option( "settings" );
+	if ( empty( $settings ) ) {
+		$settings = array(
+			'hash' => '',
+			'logged_in' => false,
+		);
+	}
+		IBX_WP::update_option( "settings", $settings );
+}
+
+add_action( 'admin_menu', 'ibx_wp_admin_menu', 9, 0 );
+
+function ibx_wp_enqueue_admin_style( $hook ) {
+	// var_dump( $hook );
+	wp_enqueue_style( 'ibx-wp-items', IBX_WP_PLUGIN_URL . '/assets/css/ibx-wp-items.css', array(), IBX_WP_PLUGIN_VER );
+
+}
+
+add_action( 'admin_enqueue_scripts', 'ibx_wp_enqueue_admin_style' ); 
+
+function ibx_wp_admin_menu() {
+	do_action( 'ibx_wp_admin_menu' );
+
+	//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
+	add_menu_page(  IBX_WP_PLUGIN_NAME, 'Iboxindia', 'administrator', IBX_WP_PLUGIN_NAME, 'displayPluginAdminDashboard', 'dashicons-admin-generic', 55 );
+
+}
+function displayPluginAdminDashboard() {
+	require_once 'admin-display.php';
+}

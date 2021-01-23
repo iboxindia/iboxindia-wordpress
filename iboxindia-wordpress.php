@@ -14,47 +14,27 @@
 /**
  * Set constants.
  */
-if ( ! defined( 'IBX_WP_NAME' ) ) {
-	define( 'IBX_WP_NAME', __( 'IboxIndia', 'iboxindia' ) );
-}
 
-if ( ! defined( 'IBX_WP_VER' ) ) {
-	define( 'IBX_WP_VER', '2.4.0' );
-}
+define( 'IBX_WP_PLUGIN_VER', '1.0.0' );
 
-if ( ! defined( 'IBX_WP_FILE' ) ) {
-	define( 'IBX_WP_FILE', __FILE__ );
-}
+define( 'IBX_WP_REQUIRED_WP_VERSION', '5.4' );
 
-if ( ! defined( 'IBX_WP_BASE' ) ) {
-	define( 'IBX_WP_BASE', plugin_basename( IBX_WP_FILE ) );
-}
+define( 'IBX_WP_TEXT_DOMAIN', 'iboxindia' );
 
-if ( ! defined( 'IBX_WP_DIR' ) ) {
-	define( 'IBX_WP_DIR', plugin_dir_path( IBX_WP_FILE ) );
-}
+define( 'IBX_WP_PLUGIN', __FILE__ );
 
-if ( ! defined( 'IBX_WP_URI' ) ) {
-	define( 'IBX_WP_URI', plugins_url( '/', IBX_WP_FILE ) );
-}
+define( 'IBX_WP_PLUGIN_BASENAME', plugin_basename( IBX_WP_PLUGIN ) );
 
-if ( ! function_exists( 'ibx_wp_setup' ) ) :
+define( 'IBX_WP_PLUGIN_NAME', trim( dirname( IBX_WP_PLUGIN_BASENAME ), '/' ) );
 
-	/**
-	 * Iboxindia Wordpress Setup
-	 *
-	 * @since 1.0.5
-	 */
-	function ibx_wp_setup() {
-		// require_once IBX_WP_DIR . 'inc/classes/class-ibx-wp.php';
+define( 'IBX_WP_PLUGIN_DIR', untrailingslashit( dirname( IBX_WP_PLUGIN ) ) );
 
-		// Admin.
-		require_once IBX_WP_DIR . 'classes/class-ibx-wp-admin.php';
-	}
+define( 'IBX_WP_PLUGIN_MODULES_DIR', IBX_WP_PLUGIN_DIR . '/modules' );
 
-	add_action( 'plugins_loaded', 'ibx_wp_setup' );
+define( 'IBX_WP_PLUGIN_URL', untrailingslashit( plugins_url( '', IBX_WP_PLUGIN ) ) );
 
-endif;
+// Startup Notices.
+require_once IBX_WP_PLUGIN_DIR . '/admin/ibx-notices/class-ibx-notices.php';
 
-// Ibox Notices.
-require_once IBX_WP_DIR . 'admin/ibx-notices/class-ibx-notices.php';
+// 
+require_once IBX_WP_PLUGIN_DIR . '/load.php';
