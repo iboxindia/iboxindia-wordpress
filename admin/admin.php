@@ -134,7 +134,7 @@ function ibx_wp_admin_init() {
 			'logged_in' => false,
 		);
 	}
-		IBX_WP::update_option( "settings", $settings );
+	IBX_WP::update_option( "settings", $settings );
 }
 
 add_action( 'admin_menu', 'ibx_wp_admin_menu', 9, 0 );

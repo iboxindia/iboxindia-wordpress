@@ -1,6 +1,7 @@
 <?php
 
 require_once IBX_WP_PLUGIN_DIR . '/includes/functions.php';
+require_once IBX_WP_PLUGIN_DIR . '/includes/file-functions.php';
 
 if ( is_admin() ) {
 	require_once IBX_WP_PLUGIN_DIR . '/admin/admin.php';

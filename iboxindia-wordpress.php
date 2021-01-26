@@ -14,12 +14,16 @@
 /**
  * Set constants.
  */
+if( !function_exists('get_plugin_data') ){
+  require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+}
+$plugin_data = get_plugin_data( __FILE__ );
 
-define( 'IBX_WP_PLUGIN_VER', '1.0.0' );
+define( 'IBX_WP_PLUGIN_VER', $plugin_data['Version'] );
 
-define( 'IBX_WP_REQUIRED_WP_VERSION', '5.4' );
+define( 'IBX_WP_REQUIRED_WP_VERSION', $plugin_data['RequiresWP'] );
 
-define( 'IBX_WP_TEXT_DOMAIN', 'iboxindia' );
+define( 'IBX_WP_TEXT_DOMAIN', $plugin_data['TextDomain'] );
 
 define( 'IBX_WP_PLUGIN', __FILE__ );
 

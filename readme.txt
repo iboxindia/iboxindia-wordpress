@@ -1,6 +1,6 @@
 === Iboxindia Wordpress ===
 Contributors: iboxindia
-Donate link: https://iboxindia.com/wordpress/free
+Donate link: https://wordpress.iboxindia.com/free
 Tags: iboxindia,free,theme
 Requires at least: 4.7
 Tested up to: 5.4
@@ -11,4 +11,4 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-Plugin to setup a wordpress complete website with private collections of available themes & plugins available after login. Free themes can be downloaded from `https://iboxindia.com/wordpress/free`.
+Plugin to setup a wordpress complete website with private collections of available themes & plugins available after login. Free themes can be downloaded from `https://wordpress.iboxindia.com/free`.

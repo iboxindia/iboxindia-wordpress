@@ -23,15 +23,12 @@ function ibx_wp_get_request_uri() {
 
 	return esc_url_raw( $request_uri );
 }
-// $base_url = "https://iboxindia.com/wordpress";
 
-function ibx_wp_postman_get($uri='', $params=[]) {
+function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com/packages') {
   $params['json']=true;
   $settings = IBX_WP::get_option( "settings" );
-  $base_url = "https://wordpress.iboxindia.com/packages";
   $curl = curl_init();
   $url = $base_url . $uri . '?' . http_build_query($params);
-  // echo $url;
   curl_setopt_array($curl, array(
     CURLOPT_URL => $url,
     CURLOPT_RETURNTRANSFER => true,
@@ -67,6 +64,36 @@ function ibx_wp_postman_get($uri='', $params=[]) {
   if( isset( $response['error'] ) ) { return false; }
   return $response;
 }
-function ibx_wp_postman_post() {
-  echo '1';
+add_action("wp_ajax_ibx_wp_download", "ibx_wp_download");
+
+function ibx_wp_download() {
+  if ( ! current_user_can( 'install_themes' ) ) {
+    exit( __( 'Sorry, you are not allowed to install themes on this site.' ) );
+  }
+  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php'; // For themes_api().
+
+  $slug = $_GET['slug'];
+  if ( !wp_verify_nonce( $_GET['nonce'], $slug)) {
+    exit("No naughty business please");
+  }
+
+  $package_info = ibx_wp_postman_get('/' . $slug);
+  // echo ($package_info['download_url']);
+  $result = ibx_wp_postman_get($package_info['download_url'], [],'');
+
+  $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];
+  
+  // //download file in uploads dir
+  $result = ibx_wp_download_file($file_url, $result['asset_name']);
+
+  $up = new Theme_Upgrader();
+  $up->install( $result['data']['file'] );
+  // extract file
+
+
+  $result = json_encode($result['data']['file']);
+  echo $result;
+
+  die();
+
 }
