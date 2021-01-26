@@ -6,7 +6,7 @@
  * Version: 1.0.0
  * Author: IboxIndia
  * Author URI: https://iboxindia.com
- * Text Domain: iboxindia
+ * Text Domain: iboxindia 
  *
  * @package Iboxindia
  */
