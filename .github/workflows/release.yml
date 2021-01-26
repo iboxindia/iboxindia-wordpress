@@ -25,11 +25,11 @@ jobs:
         echo "REPO_URL=https://github.com/${{ github.repository }}" >> $GITHUB_ENV
         echo "REPOSITORY_OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
 
-        version=`sed -n 's/^Version: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
+        version=`sed -n 's/^ \* Version: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
         echo "VERSION=$version" >> $GITHUB_ENV
-        name=`sed -n 's/^Plugin Name: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
+        name=`sed -n 's/^ \* Plugin Name: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
         echo "ASSET_NAME=$name" >> $GITHUB_ENV
-        author=`sed -n 's/^Author: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
+        author=`sed -n 's/^ \* Author: \(.*\)$/\1/p' ${{ github.event.repository.name }}.php`
         echo "AUTHOR=$author" >> $GITHUB_ENV
         
     - name: Create zip archive
