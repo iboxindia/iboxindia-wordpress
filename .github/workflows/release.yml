@@ -40,6 +40,16 @@ jobs:
         /bin/rm -rf .github
         /usr/bin/zip -r ${{ env.REPO_NAME }}.zip ${{ env.REPO_NAME }}
         echo $VERSION
+    - name: Upload screenshot to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: screenshot.png
+        asset_name: screenshot.png
+        tag: ${{ env.VERSION }}
+        overwrite: true
+        body: "${{ env.ASSET_NAME }} ${{ env.VERSION }}"
+        
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
