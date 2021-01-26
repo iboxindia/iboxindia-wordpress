@@ -21,7 +21,12 @@
     $params=[];
     if ( isset ( $_GET['tab'] ) && $_GET['tab'] == 'plugins' ) {
       $tab = $_GET['tab']; 
-      $existing_items = get_plugins();
+      $existing_items = [];
+      $plugin_array = get_plugins();
+      foreach ( $plugin_array as $key => $plugin ) {
+        $temp_array = explode( '/', $key );
+        $existing_items[str_replace( '.php', '', end( $temp_array ) )] = $plugin;
+      }
       $base_uri='';
       $params['type']='plugin';
     } else {
