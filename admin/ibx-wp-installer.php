@@ -1,17 +1,18 @@
 <?php
-  $type = isset ( $_GET['type'] ) ? $_GET['type'] : 'theme';
+  $type = sanitize_key( isset ( $_GET['type'] ) ? $_GET['type'] : 'theme' );
 
   if ( ! current_user_can( 'install_themes' ) ) {
     die( __( 'Sorry, you are not allowed to install themes on this site.' ) );
   }
-  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php'; // For themes_api().
+  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-  $slug = $_GET['slug'];
+  $slug = sanitize_key( $_GET['slug'] );
   if ( !wp_verify_nonce( $_GET['nonce'], $slug)) {
     die( __( 'No naughty business please.' ) );
   }
 
-  $package_info = ibx_wp_postman_get('/' . $slug);
+  $package_info = ibx_wp_postman_get('/packages/' . $slug);
+  // var_dump($package_info);
   $result = ibx_wp_postman_get($package_info['download_url'], [],'');
 
   $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];

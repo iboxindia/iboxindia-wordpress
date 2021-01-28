@@ -24,35 +24,66 @@ function ibx_wp_get_request_uri() {
 	return esc_url_raw( $request_uri );
 }
 
-function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com/packages') {
+function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
   $params['json']=true;
   $settings = IBX_WP::get_option( "settings" );
-  $curl = curl_init();
   $url = $base_url . $uri . '?' . http_build_query($params);
-  curl_setopt_array($curl, array(
-    CURLOPT_URL => $url,
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_ENCODING => "",
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 30,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => "GET",
-    CURLOPT_HTTPHEADER => array(
-      // "x-hash: " . $settings['hash'],
-    ),
-  ) );
-  $response = curl_exec($curl);
-  $err = curl_error($curl);
-  curl_close($curl);
-  if ($err) {
-    //Only show errors while testing
-    //echo "cURL Error #:" . $err;
+
+  $args = array(
+    'headers' => array(
+      'domain' => get_site_url(),
+    )
+  );
+  if ( ! empty( $settings['hash'] ) ) {
+    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
+  }
+
+  $response = wp_remote_get ( $url, $args );
+  if ( is_wp_error( $response ) ) {
+    $error_message = $response->get_error_message();
     $response = array(
-      'error' => $err
+      'error' => $error_message
     );
   } else {
-    $tempResponse = json_decode($response, true);
+    $body = wp_remote_retrieve_body( $response );
+    $tempResponse = json_decode($body, true);
+    if($tempResponse['statusCode'] == 200) {
+      $response = $tempResponse['data'];
+    } else {
+      $response = array(
+        'error' => $tempResponse
+      );
+    }
+  }
+  if( isset( $response['error'] ) ) { return false; }
+  return $response;
+}
+function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
+  // $params['json']=true;
+  $settings = IBX_WP::get_option( "settings" );
+  $url = $base_url . $uri . '?json';
+  // var_dump(json_encode($params));
+  $args = array(
+    'headers' => array(
+      'domain' => get_site_url(),
+    ),
+    'body'    => json_encode($params)
+  );
+  if ( ! empty( $settings['hash'] ) ) {
+    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
+  }
+
+  // var_dump($args);
+  $response = wp_remote_post ( $url, $args );
+  // var_dump($response);
+  if ( is_wp_error( $response ) ) {
+    $error_message = $response->get_error_message();
+    $response = array(
+      'error' => $error_message
+    );
+  } else {
+    $body = wp_remote_retrieve_body( $response );
+    $tempResponse = json_decode($body, true);
     if($tempResponse['statusCode'] == 200) {
       $response = $tempResponse['data'];
     } else {
@@ -72,7 +103,7 @@ function ibx_wp_download() {
   }
   include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php'; // For themes_api().
 
-  $slug = $_GET['slug'];
+  $slug = sanitize_key( $_GET['slug'] );
   if ( !wp_verify_nonce( $_GET['nonce'], $slug)) {
     exit("No naughty business please");
   }
@@ -85,6 +116,7 @@ function ibx_wp_download() {
   
   // //download file in uploads dir
   $result = ibx_wp_download_file($file_url, $result['asset_name']);
+
 
   $up = new Theme_Upgrader();
   $up->install( $result['data']['file'] );
