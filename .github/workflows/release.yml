@@ -63,5 +63,5 @@ jobs:
       run: |
         curl  --header "Content-Type: application/json" \
               --request POST \
-              --data '{"type": "plugin","author": "${{ env.AUTHOR }}","name": "${{ env.ASSET_NAME }}","version": "${{ env.VERSION }}","wp_minimum_version": "5.0.0","wp_tested_version": "5.4.2","php_required_version": "7.0.1","repoType": "github","repoUrl": "${{ env.REPO_URL }}","repoOwner": "${{ env.REPOSITORY_OWNER }}"}' \
+              --data '{"type": "plugin","author": "${{ env.AUTHOR }}","name": "${{ env.ASSET_NAME }}","version": "${{ env.VERSION }}","wp_minimum_version": "5.0.0","wp_tested_version": "5.4.2","php_required_version": "7.0.1","repoType": "github","repoName": "iboxindia-wordpress","repoUrl": "${{ env.REPO_URL }}","repoOwner": "${{ env.REPOSITORY_OWNER }}"}' \
               https://wordpress.iboxindia.com/updates/${{ env.REPO_NAME }}
