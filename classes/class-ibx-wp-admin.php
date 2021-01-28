@@ -70,7 +70,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 					'message' => sprintf(
 						'<div class="ibx-notice-container">
 							<div class="notice-image" style="display: flex;">
-								<img src="%1$s" class="hide custom-logo" alt="Iboxindia Wordpress" itemprop="logo" style="max-width: 90px;">
+								<img src="%1$s" class="hide custom-logo" alt="Iboxindia" itemprop="logo" style="max-width: 90px;">
 							</div>
 							<div class="notice-content">
 								<div class="notice-heading">

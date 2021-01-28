@@ -3,7 +3,7 @@
   /**
    * Settings Page
    */
-  $action = isset ( $_GET['action'] ) ? $_GET['action'] : '';
+  $action = sanitize_key( isset ( $_GET['action'] ) ? $_GET['action'] : '' );
 
   if($action == 'ibx_wp_download') {
     require_once 'ibx-wp-installer.php';
@@ -12,26 +12,26 @@
     $settings = IBX_WP::get_option( "settings" );
     $open_source = true;
     
-    if( $settings['hash'] != '' ) {
+    if( !empty( $settings['hash'] ) ) {
       $open_source = false;
     }
 
     $tab = 'themes'; 
 
     $params=[];
-    if ( isset ( $_GET['tab'] ) && $_GET['tab'] == 'plugins' ) {
-      $tab = $_GET['tab']; 
+    if ( isset ( $_GET['tab'] ) && sanitize_key( $_GET['tab'] ) == 'plugins' ) {
+      $tab = sanitize_key( $_GET['tab'] ); 
       $existing_items = [];
       $plugin_array = get_plugins();
       foreach ( $plugin_array as $key => $plugin ) {
         $temp_array = explode( '/', $key );
         $existing_items[str_replace( '.php', '', end( $temp_array ) )] = $plugin;
       }
-      $base_uri='';
+      $base_uri='/packages';
       $params['type']='plugin';
     } else {
       $existing_items = wp_get_themes();
-      $base_uri='';
+      $base_uri='/packages';
       $params['type']='theme';
     }
 

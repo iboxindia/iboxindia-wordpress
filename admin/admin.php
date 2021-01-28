@@ -153,7 +153,22 @@ function ibx_wp_admin_menu() {
 	//add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
 	add_menu_page(  IBX_WP_PLUGIN_NAME, 'Iboxindia', 'administrator', IBX_WP_PLUGIN_NAME, 'displayPluginAdminDashboard', 'dashicons-admin-generic', 55 );
 
+	//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
+	add_submenu_page( IBX_WP_PLUGIN_NAME, 'Iboxindia Settings', 'Settings', 'administrator', IBX_WP_PLUGIN_NAME.'-settings', 'displayPluginAdminSettings' );
+
+	$settings = IBX_WP::get_option( "settings" );
+
+	if( !empty( $settings['hash'] ) ) {
+		//add_submenu_page( '$parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function );
+		add_submenu_page( IBX_WP_PLUGIN_NAME, 'Iboxindia Import Data', 'Import Demo Data', 'administrator', IBX_WP_PLUGIN_NAME.'-demo-import', 'displayPluginAdminImportData' );
+	}
 }
 function displayPluginAdminDashboard() {
 	require_once 'admin-display.php';
+}
+function displayPluginAdminSettings() {
+	require_once 'admin-settings-display.php';
+}
+function displayPluginAdminImportData() {
+	echo "TODO";
 }
