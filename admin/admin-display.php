@@ -42,7 +42,7 @@
       echo '<h2 class="nav-tab-wrapper">';
       foreach( $tabs as $tab => $name ){
           $class = ( $tab == $current ) ? ' nav-tab-active' : '';
-          echo "<a class='nav-tab$class' href='?page=iboxindia-wordpress&tab=$tab'>$name</a>";
+          echo "<a class='nav-tab$class' href='?page=iboxindia&tab=$tab'>$name</a>";
           
         }
         echo '</h2>';
@@ -63,6 +63,9 @@
         ?>
         <div class="ibx-item" tabindex="0" >
           <div class="ibx-item-screenshot">
+            <div class="ibx-item-version tag">
+              <?php echo 'v' . $item['latest_version']; ?>
+            </div>
             <img src="<?php echo $item['thumbnail_url']; ?>" alt="<?php echo $item['name']; ?>">
           </div>
           <?php if ( $existing_item != null ) { ?>
@@ -83,7 +86,7 @@
               <div class="ibx-item-actions">
                 <?php
                   $nonce = wp_create_nonce($item['slug']);
-                  $link = admin_url('?page=iboxindia-wordpress&action=ibx_wp_download&slug='.$item['slug'].'&nonce='.$nonce);
+                  $link = admin_url('?page=iboxindia&action=ibx_wp_download&slug='.$item['slug'].'&nonce='.$nonce);
                   echo '<a class="button button-primary" data-nonce="' . $nonce . '" data-slug="' . $item['slug'] . '" href="' . $link . '">Install</a>';
                 ?>
               </div>
