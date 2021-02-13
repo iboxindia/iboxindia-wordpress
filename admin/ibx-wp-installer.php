@@ -30,7 +30,7 @@
   $up->install( $result['data']['file'] );
   // $result = json_encode($result['data']['file']);
 
-  $link = admin_url('?page=iboxindia-wordpress&tab='.$package_info['type']);
+  $link = admin_url('?page=iboxindia&tab='.$package_info['type']);
 ?>
 <script>
 setTimeout(function(){

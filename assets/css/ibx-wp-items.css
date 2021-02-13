@@ -121,3 +121,14 @@
 .ibx-items-browser .ibx-item.active .ibx-item-actions .button-primary {
     margin-right: 0
 }
+.tag {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #236095;
+    color: #FFF;
+    border: 1px solid #FFF;
+    padding: 2px 5px;
+    border-radius: 4px;
+    z-index: 10;
+}
