@@ -21,6 +21,8 @@
   $result = ibx_wp_download_file($file_url, $result['asset_name']);
 
   // var_dump($package_info);
+  // var_dump($result);
+
   if($package_info['type'] == 'theme') {
     $up = new Theme_Upgrader();
   } else if($package_info['type'] == 'plugin') {
