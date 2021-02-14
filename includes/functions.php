@@ -95,7 +95,7 @@ function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.i
   if( isset( $response['error'] ) ) { return false; }
   return $response;
 }
-add_action("wp_ajax_ibx_wp_download", "ibx_wp_download");
+// add_action("wp_ajax_ibx_wp_download", "ibx_wp_download");
 
 function ibx_wp_download() { 
   
@@ -132,19 +132,30 @@ function ibx_wp_download() {
   }
 
   if($package_info['type'] == 'theme') {
-    $up = new Theme_Upgrader();
+    $destination_path = WP_CONTENT_DIR . '/themes';
+    // $up = new Theme_Upgrader();
   } else if($package_info['type'] == 'plugin') {
-    $up = new Plugin_Upgrader();
+    $destination_path = WP_PLUGIN_DIR;
+    // $up = new Plugin_Upgrader();
   }
-  
-  if( isset( $result['data']['file'] ) )
-    $up->install( $result['data']['file'] );
+
+  WP_Filesystem();
+  $unzipfile = unzip_file( $result['data']['file'], $destination_path);
+    
+  if ( $unzipfile ) {
+    echo 'Successfully installed ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
+  } else {
+    echo 'Failed to install ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
+  }
+
+  // if( isset( $result['data']['file'] ) )
+  //   $up->install( $result['data']['file'] );
   // extract file
 
 
-  $result = json_encode($result['data']['file']);
-  echo $result;
+  // $result = json_encode($result['data']['file']);
+  // echo $result;
 
-  die();
+  return $package_info;
 
 }
