@@ -1,6 +1,6 @@
 <?php
-  ibx_wp_download();
-  $link = admin_url('?page=iboxindia&tab='.$package_info['type']);
+  $result = ibx_wp_download();
+  $link = admin_url('?page=iboxindia&tab='.$result['type']);
 ?>
 <a href="<?php echo $link; ?>"> <-- Go Back</a>
 <script>

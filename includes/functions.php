@@ -140,12 +140,12 @@ function ibx_wp_download() {
   }
 
   WP_Filesystem();
-  $unzipfile = unzip_file( $$result['data']['file'], $destination_path);
+  $unzipfile = unzip_file( $result['data']['file'], $destination_path);
     
   if ( $unzipfile ) {
-    echo 'Successfully installed ' . $result['asset_name'] . ' to [' . $destination_path . ']';
+    echo 'Successfully installed ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
   } else {
-    echo 'Failed to install ' . $result['asset_name'] . ' to [' . $destination_path . ']';
+    echo 'Failed to install ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
   }
 
   // if( isset( $result['data']['file'] ) )
@@ -153,6 +153,9 @@ function ibx_wp_download() {
   // extract file
 
 
-  $result = json_encode($result['data']['file']);
-  echo $result;
+  // $result = json_encode($result['data']['file']);
+  // echo $result;
+
+  return $package_info;
+
 }
