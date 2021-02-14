@@ -132,6 +132,8 @@ function ibx_wp_admin_init() {
 		$settings = array(
 			'hash' => '',
 			'logged_in' => false,
+			'timeout' => 30,
+			'debug' => false,
 		);
 	}
 	IBX_WP::update_option( "settings", $settings );

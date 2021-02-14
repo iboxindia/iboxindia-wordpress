@@ -1,4 +1,6 @@
 <?php
+  $settings = IBX_WP::get_option( "settings" );
+
   $type = sanitize_key( isset ( $_GET['type'] ) ? $_GET['type'] : 'theme' );
 
   if ( ! current_user_can( 'install_themes' ) ) {
@@ -16,12 +18,21 @@
   $result = ibx_wp_postman_get($package_info['download_url'], [],'');
 
   $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];
-  
-  // //download file in uploads dir
-  $result = ibx_wp_download_file($file_url, $result['asset_name']);
 
-  // var_dump($package_info);
-  // var_dump($result);
+  // //download file in uploads dir
+  $result = ibx_wp_download_file($file_url, $result['asset_name'], $settings['timeout']);
+
+  if( $settings['debug'] ) {
+    echo '<hr />';
+    echo '<pre>';
+    var_dump($package_info);
+    echo '</pre>';
+    echo '<hr />';
+    echo '<pre>';
+    var_dump($result);
+    echo '</pre>';
+    echo '<hr />';
+  }
 
   if($package_info['type'] == 'theme') {
     $up = new Theme_Upgrader();
@@ -29,13 +40,15 @@
     $up = new Plugin_Upgrader();
   }
   
-  $up->install( $result['data']['file'] );
+  if( isset( $result['data']['file'] ) )
+    $up->install( $result['data']['file'] );
   // $result = json_encode($result['data']['file']);
 
   $link = admin_url('?page=iboxindia&tab='.$package_info['type']);
 ?>
+<a href="<?php echo $link; ?>"> <-- Go Back</a>
 <script>
-setTimeout(function(){
-  window.location = "<?php echo $link; ?>";
-}, 5000);
+// setTimeout(function(){
+  // window.location = "";
+// }, 10000);
 </script>
