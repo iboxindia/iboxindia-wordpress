@@ -132,3 +132,30 @@
     border-radius: 4px;
     z-index: 10;
 }
+.iboxindia-settings {
+    background: #FFF;
+    border: 1px solid #327dba;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+.iboxindia-settings button {
+    min-width: 200px;
+    background: #327dba;
+    color: #FFF;
+    border: 1px solid #000;
+    padding: 8px 10px;
+    border-radius: 4px;
+}
+.iboxindia-settings button:hover{
+    background-color: #235e8e;
+}
+.login-logout-section button {
+    margin-left: 30px;
+    background-color: #9c0000;
+    color: #FFF;
+    border: 0;
+}
+.login-logout-section button:hover {
+    background-color: #7b0505;
+}

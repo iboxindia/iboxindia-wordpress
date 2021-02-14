@@ -94,10 +94,8 @@ function ibx_wp_custom_file_download( $url, $timeout = 300 ) {
   return $tmpfname;
 }
 
-function ibx_wp_download_file ( $file_url, $file_name ) {
+function ibx_wp_download_file ( $file_url, $file_name, $timeout_seconds ) {
   
-  $timeout_seconds = 60;
-
   // // Download file to temp dir.
   $temp_file = ibx_wp_custom_file_download( $file_url, $timeout_seconds );
 
