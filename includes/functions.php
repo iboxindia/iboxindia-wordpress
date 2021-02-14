@@ -97,29 +97,48 @@ function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.i
 }
 add_action("wp_ajax_ibx_wp_download", "ibx_wp_download");
 
-function ibx_wp_download() {
+function ibx_wp_download() { 
+  
+  $settings = IBX_WP::get_option( "settings" );
   if ( ! current_user_can( 'install_themes' ) ) {
     exit( __( 'Sorry, you are not allowed to install themes on this site.' ) );
   }
-  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php'; // For themes_api().
+  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
   $slug = sanitize_key( $_GET['slug'] );
   if ( !wp_verify_nonce( $_GET['nonce'], $slug)) {
-    exit("No naughty business please");
+    exit( __( 'No naughty business please.' ) );
   }
 
-  $package_info = ibx_wp_postman_get('/' . $slug);
-  // echo ($package_info['download_url']);
+  $package_info = ibx_wp_postman_get('/packages/' . $slug);
+  // var_dump($package_info);
   $result = ibx_wp_postman_get($package_info['download_url'], [],'');
 
   $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];
-  
+
   // //download file in uploads dir
-  $result = ibx_wp_download_file($file_url, $result['asset_name']);
+  $result = ibx_wp_download_file($file_url, $result['asset_name'], $settings['timeout']);
 
+  if( $settings['debug'] ) {
+    echo '<hr />';
+    echo '<pre>';
+    var_dump($package_info);
+    echo '</pre>';
+    echo '<hr />';
+    echo '<pre>';
+    var_dump($result);
+    echo '</pre>';
+    echo '<hr />';
+  }
 
-  $up = new Theme_Upgrader();
-  $up->install( $result['data']['file'] );
+  if($package_info['type'] == 'theme') {
+    $up = new Theme_Upgrader();
+  } else if($package_info['type'] == 'plugin') {
+    $up = new Plugin_Upgrader();
+  }
+  
+  if( isset( $result['data']['file'] ) )
+    $up->install( $result['data']['file'] );
   // extract file
 
 

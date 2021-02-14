@@ -86,7 +86,7 @@
               <div class="ibx-item-actions">
                 <?php
                   $nonce = wp_create_nonce($item['slug']);
-                  $link = admin_url('?page=iboxindia&action=ibx_wp_download&slug='.$item['slug'].'&nonce='.$nonce);
+                  $link = admin_url('admin.php?page=iboxindia&action=ibx_wp_download&slug='.$item['slug'].'&nonce='.$nonce);
                   echo '<a class="button button-primary" data-nonce="' . $nonce . '" data-slug="' . $item['slug'] . '" href="' . $link . '">Install</a>';
                 ?>
               </div>
@@ -110,5 +110,6 @@
           }
         ?>
       </div>
-    </div>
-  <?php } ?>
+    </div> <?php 
+  }
+?>
