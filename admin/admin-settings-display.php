@@ -18,7 +18,8 @@ function mask ( $str, $start = 0, $length = null ) {
 
 if($action == 'ibx_wp_settings_clear') {
   $settings['hash'] = null;
-	IBX_WP::update_option( "settings", $settings );
+  IBX_WP::reset_options();
+	//IBX_WP::update_option( "settings", $settings );
   ?>
   <script>
     window.location = window.location;

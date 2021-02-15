@@ -56,6 +56,10 @@ class IBX_WP {
 		$option = array_merge( $option, array( $name => $value ) );
 		update_option( 'ibx_wp_plugin', $option );
 	}
+	
+	public static function reset_options( ) {
+		update_option( 'ibx_wp_plugin', false );
+	}
 }
 
 add_action( 'plugins_loaded', 'ibx_wp', 10, 0 );

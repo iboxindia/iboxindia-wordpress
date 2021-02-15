@@ -1,6 +1,88 @@
 <?php
-  $result = ibx_wp_download();
-  $link = admin_url('admin.php?page=iboxindia&tab='.$result['type']);
+
+  $slug = sanitize_key( $_GET['slug'] );
+  $nonce = wp_create_nonce( $slug );
+?>
+<div class="installer">
+  <table>
+  <tr>
+      <td>
+        <a class="info-btn ajax-btn" data-action="ibx_wp_get_package_info" data-nonce="<?php echo $nonce; ?>" href="#">Get Information</a>
+      </td>
+      <td><div class="progressbar">&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td>
+      <a class="download-btn ajax-btn" data-action="ibx_wp_download_package" data-nonce="<?php echo $nonce; ?>" href="#">Download</a>
+      </td>
+      <td><div class="progressbar">&nbsp;</div></td>
+    </tr>
+    <tr>
+      <td>
+        <a class="install-btn install-btn" data-action="ibx_wp_install_package" data-nonce="<?php echo $nonce; ?>" href="#">Install</a>
+      </td>
+      <td><div class="progressbar">&nbsp;</div></td>
+    </tr>
+  </table>
+</div>
+
+<script>
+  jQuery(document).ready( function() {
+    asset = "";
+    type = "";
+    jQuery(".info-btn").click( function(e) {
+      e.preventDefault();
+      ele = this;
+      jQuery(ele).closest('tr').find('.progressbar').addClass('loading');
+      action = jQuery(this).attr("data-action")
+      link = "<?php echo admin_url('admin-ajax.php?slug=' . $slug . '&nonce=' . $nonce . '&action='); ?>" + action
+      jQuery.ajax({
+        type : "post",
+        dataType : "json",
+        url : link,
+        data : {slug: "<?php echo $slug; ?>", nonce: "<?php echo $nonce; ?>"},
+        success: function(response) {
+          jQuery(ele).closest('tr').find('.progressbar').removeClass('loading');
+          type = response.type;
+          console.log(response);
+          // authenticated: false
+          // author: "P-THEMES"
+          // download_url: "https://wordpress.iboxindia.com/packages/porto/download"
+          // latest_version: "6.0.5"
+          // name: "Porto"
+          // open_source: false
+          // slug: "porto"
+          // thumbnail_url: "https://wordpress.iboxindia.com/packages/porto/thumbnail"
+          // type: "theme"
+          // if(response.type == "success") {
+          // } else {
+          //   alert("Your vote could not be added")
+          // }
+        }
+      });
+    });
+    jQuery(".download-btn, .install-btn").click( function(e) {
+      e.preventDefault();
+      ele = this;
+      jQuery(ele).closest('tr').find('.progressbar').addClass('loading');
+      action = jQuery(this).attr("data-action")
+      link = "<?php echo admin_url('admin-ajax.php?slug=' . $slug . '&nonce=' . $nonce . '&action='); ?>" + action
+      jQuery.ajax({
+        type : "post",
+        dataType : "json",
+        url : link,
+        data : {slug: "<?php echo $slug; ?>", nonce: "<?php echo $nonce; ?>"},
+        success: function(response) {
+          jQuery(ele).closest('tr').find('.progressbar').removeClass('loading');
+          console.log(response);
+        }
+      });
+    });
+  });
+</script>
+
+<?php
+  $link = "";//admin_url('admin.php?page=iboxindia&tab='.$result['type']);
 ?>
 <a href="<?php echo $link; ?>"> <-- Go Back</a>
 <script>
