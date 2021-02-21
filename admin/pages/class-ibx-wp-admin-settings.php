@@ -166,5 +166,6 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
       <?php }
     }
   }
+  Iboxindia_WP_Settings_Page::get_instance();
 endif;
 ?>

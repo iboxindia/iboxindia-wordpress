@@ -48,6 +48,7 @@ require_once IBX_WP_PLUGIN_DIR . '/admin/pages/class-ibx-wp-package-installer.ph
 require_once IBX_WP_PLUGIN_DIR . '/admin/classes/class-ibx-wp-admin.php';
 
 require_once IBX_WP_PLUGIN_DIR . '/admin/pages/class-ibx-wp-admin-settings.php';
+require_once IBX_WP_PLUGIN_DIR . '/admin/pages/class-ibx-wp-data-import.php';
 require_once IBX_WP_PLUGIN_DIR . '/admin/pages/class-ibx-wp-backup-restore.php';
 
 require_once IBX_WP_PLUGIN_DIR . '/load.php';
