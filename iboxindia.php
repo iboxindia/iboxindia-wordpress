@@ -41,4 +41,6 @@ define( 'IBX_WP_PLUGIN_URL', untrailingslashit( plugins_url( '', IBX_WP_PLUGIN )
 require_once IBX_WP_PLUGIN_DIR . '/admin/ibx-notices/class-ibx-notices.php';
 
 // 
+require_once IBX_WP_PLUGIN_DIR . '/admin/classes/class-ibx-wp-admin.php';
+
 require_once IBX_WP_PLUGIN_DIR . '/load.php';

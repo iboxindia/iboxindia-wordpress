@@ -58,7 +58,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 		 */
 		public function admin_notices() {
 
-			$image_path = esc_url( IBX_WP_PLUGIN_URL . 'inc/assets/images/logo.svg' );
+			$image_path = esc_url( IBX_WP_PLUGIN_URL . '/inc/assets/images/logo.svg' );
 
 			Iboxindia_WP_Notices::add_notice(
 				array(
@@ -70,7 +70,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 					'message' => sprintf(
 						'<div class="ibx-notice-container">
 							<div class="notice-image" style="display: flex;">
-								<img src="%1$s" class="hide custom-logo" alt="Iboxindia" itemprop="logo" style="max-width: 90px;">
+								<img src="%1$s" class="hide custom-logo" alt="Iboxindia Wordpress" itemprop="logo" style="max-width: 90px;">
 							</div>
 							<div class="notice-content">
 								<div class="notice-heading">
@@ -83,13 +83,13 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 									</a>
 									
 									<span class="dashicons dashicons-calendar"></span>
-									<a href="#" data-repeat-notice-after="%6$s" class="ibox-notice-close ibox-review-notice">
+									<a href="%6$s" class="ibox-notice-close ibox-review-notice">
 									%7$s
 									</a>
 									
 									<span class="dashicons dashicons-smiley"></span>
-									<a href="#" class="ibx-notice-close ibox-review-notice">
-									%8$s
+									<a href="%8$s" class="ibx-notice-close ibox-review-notice">
+									%9$s
 									</a>
 								</div>
 							</div>
@@ -97,10 +97,11 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 						$image_path,
 						__( 'Hello! We noticed that the Iboxindia Wordpress Setup plugin is active. If you have installed this plugin by mistake, we request you to kindly deactivate it to remove this notice.', 'iboxindia' ),
 						__( 'If you need any assistance from us to setup your website and get online within minutes, just click the below button to get in touch. &mdash; Thanks a ton!', 'iboxindia' ),
-						'https://iboxindia.com/contact?wordpress=true&site=blog_url',
+						'https://iboxindia.com/contact?wordpress=true&site=' . get_site_url(),
 						__( 'Ok, Please help me.', 'iboxindia' ),
-						MONTH_IN_SECONDS,
+						'#',
 						__( 'Nope, maybe later', 'iboxindia' ),
+						'https://wordpress.iboxindia.com/support?wordpress=true&site=' . get_site_url(),
 						__( 'Support our free efforts', 'iboxindia' )
 					),
 				)
@@ -116,7 +117,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
 		 */
 		public static function notice_assets() {
 			$file = is_rtl() ? 'ibx-wp-notices-rtl.css' : 'ibx-wp-notices.css';
-			wp_enqueue_style( 'ibx-wp-notices', IBX_WP_PLUGIN_URL . 'assets/css/' . $file, array(), IBX_WP_PLUGIN_VER );
+			wp_enqueue_style( 'ibx-wp-notices', IBX_WP_PLUGIN_URL . '/assets/css/' . $file, array(), IBX_WP_PLUGIN_VER );
 		}
 	}
 
