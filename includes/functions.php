@@ -26,7 +26,7 @@ function ibx_wp_get_request_uri() {
 
 function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
   $params['json']=true;
-  $settings = IBX_WP::get_option( "settings" );
+  $hash = Iboxindia_WP_Settings::get( "hash" );
   $url = $base_url . $uri . '?' . http_build_query($params);
 
   $args = array(
@@ -34,8 +34,8 @@ function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.ib
       'domain' => get_site_url(),
     )
   );
-  if ( ! empty( $settings['hash'] ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
+  if ( ! empty( $hash ) ) {
+    $args['headers']['Authorization'] = 'Bearer ' . $hash;
   }
 
   $response = wp_remote_get ( $url, $args );
@@ -60,7 +60,7 @@ function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.ib
 }
 function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
   // $params['json']=true;
-  $settings = IBX_WP::get_option( "settings" );
+  $hash = Iboxindia_WP_Settings::get( "hash" );
   $url = $base_url . $uri . '?json';
   // var_dump(json_encode($params));
   $args = array(
@@ -69,8 +69,8 @@ function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.i
     ),
     'body'    => json_encode($params)
   );
-  if ( ! empty( $settings['hash'] ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
+  if ( ! empty( $hash ) ) {
+    $args['headers']['Authorization'] = 'Bearer ' . $hash;
   }
 
   // var_dump($args);
@@ -97,7 +97,7 @@ function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.i
 }
 add_action("wp_ajax_ibx_wp_get_package_info", "ibx_wp_get_package_info");
 function ibx_wp_get_package_info() {
-  $settings = IBX_WP::get_option( "settings" );
+  $hash = Iboxindia_WP_Settings::get( "hash" );
 
   $slug = sanitize_key( $_POST['slug'] );
   if ( !wp_verify_nonce( $_POST['nonce'], $slug)) {
@@ -108,7 +108,7 @@ function ibx_wp_get_package_info() {
 
   $result = ibx_wp_postman_get($package_info['download_url'], [],'');
 
-  IBX_WP::update_option( "package_info", $result);
+  Iboxindia_WP_Settings::set( "package_info", $result);
 
   wp_send_json( $package_info );
   // wp_send_json($result);
@@ -117,7 +117,7 @@ function ibx_wp_get_package_info() {
 add_action("wp_ajax_ibx_wp_download_package", "ibx_wp_download_package");
 function ibx_wp_download_package() {
   
-  $settings = IBX_WP::get_option( "settings" );
+  $timeout = Iboxindia_WP_Settings::get( "settings" );
   if ( ! current_user_can( 'install_themes' ) ) {
     wp_send_json( __( 'Sorry, you are not allowed to install themes on this site.' ) );
   }
@@ -127,22 +127,22 @@ function ibx_wp_download_package() {
     wp_send_json( __( 'No naughty business please.' ) );
   }
 
-  $package_info = IBX_WP::get_option( "package_info" );
+  $package_info = Iboxindia_WP_Settings::get( "package_info" );
   // wp_send_json($package_info);
 
   $file_url = $package_info['http_scheme'] . '://' . ( $package_info['auth_key'] ? ( $package_info['auth_key'] . '@' ) : '' ) . $package_info['asset_url'];
 
   // //download file in uploads dir
-  $result = ibx_wp_download_file($file_url, $package_info['asset_name'], $settings['timeout']);
+  $result = ibx_wp_download_file($file_url, $package_info['asset_name'], $timeout);
 
-  IBX_WP::update_option( "download_info", $result );
+  Iboxindia_WP_Settings::set( "download_info", $result );
 
   wp_send_json($result);
 }
 add_action("wp_ajax_ibx_wp_install_package", "ibx_wp_install_package");
 function ibx_wp_install_package() {
-  $package_info = IBX_WP::get_option( "package_info" );
-  $download_info = IBX_WP::get_option( "download_info" );
+  $package_info = Iboxindia_WP_Settings::get( "package_info" );
+  $download_info = Iboxindia_WP_Settings::get( "download_info" );
 
   $slug = sanitize_key( $_POST['slug'] );
   if ( !wp_verify_nonce( $_POST['nonce'], $slug)) {

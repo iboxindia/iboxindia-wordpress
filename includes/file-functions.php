@@ -19,7 +19,7 @@
 
 function ibx_wp_custom_file_download( $url, $timeout = 300 ) {
   
-  $settings = IBX_WP::get_option( "settings" );
+  // $settings = IBX_WP::get_option( "settings" );
   // Gives us access to the download_url() and wp_handle_sideload() functions.
   require_once( ABSPATH . 'wp-admin/includes/file.php' );
   

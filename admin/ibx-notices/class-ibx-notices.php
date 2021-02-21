@@ -75,6 +75,7 @@ if ( ! class_exists( 'Iboxindia_WP_Notices' ) ) :
 		 */
 		public function __construct() {
 			add_action( 'admin_notices', array( $this, 'show_notices' ), 30 );
+			// add_action( 'ibx_wp_notice_before_markup', array( $this, 'notice_assets' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 			add_action( 'wp_ajax_ibx-wp-notice-dismiss', array( $this, 'dismiss_notice' ) );
 			add_filter( 'wp_kses_allowed_html', array( $this, 'add_data_attributes' ), 10, 2 );
@@ -155,6 +156,8 @@ if ( ! class_exists( 'Iboxindia_WP_Notices' ) ) :
 					'_notice_nonce' => wp_create_nonce( 'ibx-wp-notices' ),
 				)
 			);
+			$file = is_rtl() ? 'ibx-wp-notices-rtl.css' : 'ibx-wp-notices.css';
+			wp_enqueue_style( 'ibx-wp-notices', IBX_WP_PLUGIN_URL . '/assets/css/' . $file, array(), IBX_WP_PLUGIN_VER );
 		}
 
 		/**
