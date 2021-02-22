@@ -85,7 +85,7 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
       } else if($action == 'ibx_wp_settings_login') {
         $username = sanitize_text_field( isset ( $_POST['username'] ) ? $_POST['username'] : '' );
         $password = sanitize_text_field( isset ( $_POST['password'] ) ? $_POST['password'] : '' );
-        $resp = ibx_wp_postman_post('/u/login', ["username" => $username, "password" => $password]);
+        $resp = Iboxindia_WP_Rest_Client::post('/u/login', ["username" => $username, "password" => $password]);
         // var_dump($resp);
         if( $resp['code'] == 200 ) {
           Iboxindia_WP_Settings::set( "hash", $resp['jwt'] );

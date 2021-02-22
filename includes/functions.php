@@ -24,77 +24,6 @@ function ibx_wp_get_request_uri() {
 	return esc_url_raw( $request_uri );
 }
 
-function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
-  $params['json']=true;
-  $hash = Iboxindia_WP_Settings::get( "hash" );
-  $url = $base_url . $uri . '?' . http_build_query($params);
-
-  $args = array(
-    'headers' => array(
-      'domain' => get_site_url(),
-    )
-  );
-  if ( ! empty( $hash ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $hash;
-  }
-
-  $response = wp_remote_get ( $url, $args );
-  if ( is_wp_error( $response ) ) {
-    $error_message = $response->get_error_message();
-    $response = array(
-      'error' => $error_message
-    );
-  } else {
-    $body = wp_remote_retrieve_body( $response );
-    $tempResponse = json_decode($body, true);
-    if($tempResponse['statusCode'] == 200) {
-      $response = $tempResponse['data'];
-    } else {
-      $response = array(
-        'error' => $tempResponse
-      );
-    }
-  }
-  if( isset( $response['error'] ) ) { return false; }
-  return $response;
-}
-function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
-  // $params['json']=true;
-  $hash = Iboxindia_WP_Settings::get( "hash" );
-  $url = $base_url . $uri . '?json';
-  // var_dump(json_encode($params));
-  $args = array(
-    'headers' => array(
-      'domain' => get_site_url(),
-    ),
-    'body'    => json_encode($params)
-  );
-  if ( ! empty( $hash ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $hash;
-  }
-
-  // var_dump($args);
-  $response = wp_remote_post ( $url, $args );
-  // var_dump($response);
-  if ( is_wp_error( $response ) ) {
-    $error_message = $response->get_error_message();
-    $response = array(
-      'error' => $error_message
-    );
-  } else {
-    $body = wp_remote_retrieve_body( $response );
-    $tempResponse = json_decode($body, true);
-    if($tempResponse['statusCode'] == 200) {
-      $response = $tempResponse['data'];
-    } else {
-      $response = array(
-        'error' => $tempResponse
-      );
-    }
-  }
-  if( isset( $response['error'] ) ) { return false; }
-  return $response;
-}
 add_action("wp_ajax_ibx_wp_get_package_info", "ibx_wp_get_package_info");
 function ibx_wp_get_package_info() {
   $hash = Iboxindia_WP_Settings::get( "hash" );
@@ -104,9 +33,9 @@ function ibx_wp_get_package_info() {
     exit( __( 'No naughty business please.' ) );
   }
 
-  $package_info = ibx_wp_postman_get('/packages/' . $slug);
+  $package_info = Iboxindia_WP_Rest_Client::get('/packages/' . $slug);
 
-  $result = ibx_wp_postman_get($package_info['download_url'], [],'');
+  $result = Iboxindia_WP_Rest_Client::get($package_info['download_url'], [],'');
 
   Iboxindia_WP_Settings::set( "package_info", $result);
 

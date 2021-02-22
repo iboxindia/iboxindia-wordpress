@@ -144,7 +144,7 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
           <?php ibx_wp_admin_tabs( $tab ); ?>
           <div class="ibx-items-browser">
             <?php
-              $items = ibx_wp_postman_get( $base_uri, $params );
+              $items = Iboxindia_WP_Rest_Client::get( $base_uri, $params );
               // var_dump( $items );
               if( $items ) {
                 render_items_array ( $items, $existing_items );
