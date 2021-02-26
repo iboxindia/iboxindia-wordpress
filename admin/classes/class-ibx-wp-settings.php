@@ -31,7 +31,7 @@ if ( ! class_exists( 'Iboxindia_WP_Settings' ) ) :
       }
     }
 
-    public static function set( $name, $value ) {
+    public static function set( $name, $value = false ) {
       $options = get_option( self::$settings_key );
       $options = ( false === $options ) ? array() : (array) $options;
       $options = array_merge( $options, array( $name => $value ) );

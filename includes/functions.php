@@ -52,7 +52,7 @@ function ibx_wp_download_package() {
   }
 
   $slug = sanitize_key( $_POST['slug'] );
-  if ( !wp_verify_nonce( $_POST['nonce'], $slug)) {
+  if ( !wp_verify_nonce( $_POST['nonce'], $slug ) ) {
     wp_send_json( __( 'No naughty business please.' ) );
   }
 

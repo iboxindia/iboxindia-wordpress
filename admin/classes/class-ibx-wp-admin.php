@@ -124,10 +124,45 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
       if( empty( Iboxindia_WP_Settings::get( "debug" ) ) ) {
         Iboxindia_WP_Settings::set( "debug", false );
       }
+      if( empty( Iboxindia_WP_Settings::get( "upload_path" ) ) ) {
+        $dirname = wp_upload_dir()['basedir'] . '/iboxindia-assets';
+        if ( ! file_exists( $dirname ) ) {
+          wp_mkdir_p( $dirname );
+        }
+        Iboxindia_WP_Settings::set( "upload_path", $dirname );
+      }
     }
 
     public function enqueue_admin_style( $hook ) {
       wp_enqueue_style( 'ibx-wp-items', IBX_WP_PLUGIN_URL . '/assets/css/ibx-wp-items.css', array(), IBX_WP_PLUGIN_VER );
+      wp_enqueue_style( 'materialize-css', '//cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', array(), '1.0.0' );
+      wp_enqueue_style( 'materialize-css-icons', '//fonts.googleapis.com/icon?family=Material+Icons' );
+			wp_register_script( 'materialize-js', '//cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js', array( 'jquery' ), '1.0.0', true );
+      wp_enqueue_script( 'materialize-js' );
+
+      $existingItems = array();
+      $existingItems['theme'] = [];
+      foreach ( wp_get_themes() as $key => $theme ) {
+        $themeMod = [];
+        // var_dump($theme);
+        $themeMod['Version'] = $theme->get('Version');
+        $themeMod['Name'] = $theme->get('Name');
+        $themeMod['Author'] = $theme->get('Author');
+        $existingItems['theme'][ $key ] = $themeMod;
+      }
+      $existingItems['plugin'] = [];
+      foreach ( get_plugins() as $key => $plugin ) {
+        $temp_array = explode( '/', $key );
+        $existingItems['plugin'][str_replace( '.php', '', end( $temp_array ) )] = $plugin;
+      }
+      
+      wp_register_script( 'ibx-wp-admin-functions', IBX_WP_PLUGIN_URL . '/assets/js/ibx-admin-functions.js', array( 'jquery' ), IBX_WP_PLUGIN_VER, true );
+      wp_localize_script( 'ibx-wp-admin-functions', 'iboxindiaConfig', [
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'existingItems' => $existingItems
+      ] );
+      wp_enqueue_script( 'ibx-wp-admin-functions' );
+
     }
     
     public function add_menu() {

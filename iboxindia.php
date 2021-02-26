@@ -1,4 +1,11 @@
 <?php
+
+ini_set( 'memory_limit', '5000M' );
+ini_set( 'upload_max_filesize', '3000M');
+ini_set( 'post_max_size', '3000M');
+ini_set( 'max_execution_time', '30000');
+ini_set( 'max_input_time', '3000');
+
 /**
  * Plugin Name: Iboxindia
  * Plugin URI: https://wordpress.iboxindia.com/
@@ -37,6 +44,7 @@ define( 'IBX_WP_PLUGIN_MODULES_DIR', IBX_WP_PLUGIN_DIR . '/modules' );
 
 define( 'IBX_WP_PLUGIN_URL', untrailingslashit( plugins_url( '', IBX_WP_PLUGIN ) ) );
 
+require_once IBX_WP_PLUGIN_DIR . '/admin/classes/class-ibx-wp.php';
 require_once IBX_WP_PLUGIN_DIR . '/admin/classes/class-ibx-wp-settings.php';
 
 // Startup Notices.

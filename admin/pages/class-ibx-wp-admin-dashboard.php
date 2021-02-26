@@ -12,6 +12,7 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
 	 */
 	class Iboxindia_WP_Dashboard_Page {
 
+		private static $version = '1.0.0';
     /**
      * Instance of Iboxindia_WP_Dashboard_Page
      *
@@ -41,119 +42,225 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
      * @since 2.3.7
      */
     private function __construct() {
+      add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+      add_action( "wp_ajax_iboxindia_packages", array( $this, 'getPackages' ) );
+      add_action( "wp_ajax_iboxindia_package_info", array( $this, 'getPackageInfo' ) );
+      add_action( "wp_ajax_iboxindia_download_package", array( $this, 'downloadPackage' ) );
+      add_action( "wp_ajax_iboxindia_install_package", array( $this, 'installPackage' ) );
+      add_action( "wp_ajax_iboxindia_update_package", array( $this, 'updatePackage' ) );
     }
 
     public function show() {
-      $action = sanitize_key( isset ( $_GET['action'] ) ? $_GET['action'] : '' );
-
-      if($action == 'ibx_wp_download') {
-        Iboxindia_WP_Package_Installer_Page::get_instance()->show();
-      } else {
-        global $pagenow;
-        $hash = Iboxindia_WP_Settings::get( "hash" );
-        $open_source = true;
-        
-        if( !empty( $hash ) ) {
-          $open_source = false;
-        }
-
-        $tab = 'themes'; 
-
-        $params=[];
-        if ( isset ( $_GET['tab'] ) && sanitize_key( $_GET['tab'] ) == 'plugins' ) {
-          $tab = sanitize_key( $_GET['tab'] ); 
-          $existing_items = [];
-          $plugin_array = get_plugins();
-          foreach ( $plugin_array as $key => $plugin ) {
-            $temp_array = explode( '/', $key );
-            $existing_items[str_replace( '.php', '', end( $temp_array ) )] = $plugin;
-          }
-          $base_uri='/packages';
-          $params['type']='plugin';
-        } else {
-          $existing_items = wp_get_themes();
-          $base_uri='/packages';
-          $params['type']='theme';
-        }
-
-        function ibx_wp_admin_tabs( $current = 'themes' ) { 
-          $tabs = array( 'themes' => 'Themes', 'plugins' => 'Plugins' ); 
-          $links = array();
-          echo '<div id="icon-themes" class="icon32"><br></div>';
-          echo '<h2 class="nav-tab-wrapper">';
-          foreach( $tabs as $tab => $name ){
-              $class = ( $tab == $current ) ? ' nav-tab-active' : '';
-              echo "<a class='nav-tab$class' href='?page=iboxindia&tab=$tab'>$name</a>";
-              
-            }
-            echo '</h2>';
-          }
-      
-          function render_items_array ( $items, $existing_items = [] ) {?>
-            <div class="ibx-items wp-clearfix">
-              <?php foreach( $items as $item ) {
-                render_item ( $item, isset( $existing_items[ $item[ 'slug' ] ] ) ? $existing_items[$item['slug']] : null );
-                // render_item ( $item );
-              } ?>
-            </div>
-            <?php
-          }
-
-          function render_item ( $item, $existing_item = null ) {
-              // var_dump ($item);
-            ?>
-            <div class="ibx-item" tabindex="0" >
+      $currentTab = isset ( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'theme';
+      $tabs = array( 'theme' => 'Themes', 'plugin' => 'Plugins' ); ?>
+      <div class="wrap">
+        <h2>Iboxindia - <?php echo Iboxindia_WP::get_instance()->isActive() ? 'Premium' : 'Open Source'; ?></h2>
+        <h2 class="nav-tab-wrapper">
+          <?php foreach( $tabs as $tab => $name ) {
+            $class = ( $tab == $currentTab ) ? 'nav-tab-active' : '';
+            echo "<a class='nav-tab $class' href='?page=iboxindia&tab=$tab'>$name</a>";
+          } ?>
+        </h2>
+        <div class="ibx-items-browser">
+          <div class="ibx-items wp-clearfix">
+            <div class="ibx-item dummy" tabindex="0" >
               <div class="ibx-item-screenshot">
-                <div class="ibx-item-version tag">
-                  <?php echo 'v' . $item['latest_version']; ?>
-                </div>
-                <img src="<?php echo $item['thumbnail_url']; ?>" alt="<?php echo $item['name']; ?>">
+                <div class="ibx-item-version tag"></div>
+                <img src="" alt="" />
               </div>
-              <?php if ( $existing_item != null ) { ?>
-                <div class="update-message notice inline notice-warning notice-alt">
-                  <p>
-                    Installed. 
-                    <?php if (version_compare($existing_item['Version'], $item['latest_version'], '<')) { ?>
-                      <button data-existing-ver="<?php echo $existing_item['ver']; ?>" data-current-ver="<?php echo $item['latest_version']; ?>" class="button-link" type="button">Update now</button>				
-                    <?php } ?>
-                  </p>
-                </div>
-              <?php } ?>
+              <div class="update-message notice inline notice-warning notice-alt">
+                <p>
+                  Installed. 
+                </p>
+              </div>
               <div class="ibx-item-container">
-                <h2 class="ibx-item-name" id="<?php echo $item['slug']; ?>">
-                  <?php echo $item['name']; ?>
-                </h2>
-                <?php if ( $existing_item == null ) { ?>
-                  <div class="ibx-item-actions">
-                    <?php
-                      $nonce = wp_create_nonce($item['slug']);
-                      $link = admin_url('admin.php?page=iboxindia&action=ibx_wp_download&slug='.$item['slug'].'&nonce='.$nonce);
-                      echo '<a class="button button-primary" data-nonce="' . $nonce . '" data-slug="' . $item['slug'] . '" href="' . $link . '">Install</a>';
-                    ?>
-                  </div>
-                <?php } ?>
+                <h2 class="ibx-item-name" id=""></h2>
+                <div class="ibx-item-actions">
+                  <button data-target="install-update-dialog" class="btn modal-trigger install-button" type="button">Install</button>
+                  <button data-existing-ver="0" data-current-ver="0" class="button button-primary update-button" type="button">Update</button>
+                </div>
               </div>
             </div>
-            <?
-          }
-        ?>
-        
-        <div class="wrap">
-          <h2>Iboxindia - <?php echo $open_source ? 'Open Source' : 'Premium'; ?></h2>
-          
-          <?php ibx_wp_admin_tabs( $tab ); ?>
-          <div class="ibx-items-browser">
-            <?php
-              $items = Iboxindia_WP_Rest_Client::get( $base_uri, $params );
-              // var_dump( $items );
-              if( $items ) {
-                render_items_array ( $items, $existing_items );
-              }
-            ?>
           </div>
-        </div> <?php 
+        </div>
+        <!-- Modal Structure -->
+        <div id="install-update-dialog" class="modal modal-fixed-footer">
+          <div class="modal-content">
+            <h4 class="header"></h4>
+            <div class="row">
+              <div class="col s3">
+                Name
+              </div>
+              <div class="col s9">
+                <span class="name"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s3">
+                Author
+              </div>
+              <div class="col s9">
+                <span class="author"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s3">
+                Type
+              </div>
+              <div class="col s9">
+                <span class="type"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s3">
+                Version
+              </div>
+              <div class="col s9">
+                <span class="version"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s3">
+                Downloaded
+              </div>
+              <div class="col s9">
+                <i class="downloaded material-icons"></i>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="waves-effect waves-light btn refresh-info">
+              <i class="material-icons left">autorenew</i>
+              Refresh Information
+            </button>
+            <button type="button" class="waves-effect waves-light btn download-package">
+              <i class="material-icons left">download</i>
+              (Re) Download file
+            </button>
+            <button type="button" class="waves-effect waves-light btn install-package" style="display:none  ">
+              <i class="material-icons right">send</i>
+              Install
+            </button>
+            <button type='button' class="modal-close waves-effect waves-red btn red">Close</a>
+          </div>
+        </div>
+        <script>
+          jQuery(document).ready( function() {
+            jQuery('#install-update-dialog').modal({
+              onOpenStart: refreshModalInfo
+            });
+            jQuery('#install-update-dialog .refresh-info').on('click', function(e) { e.stopPropagation(); showPackageInfo(this.dataset.slug); } );
+            jQuery('#install-update-dialog .download-package').on('click', function(e) { e.stopPropagation(); downloadPackage(this.dataset.slug); } );
+            jQuery('#install-update-dialog .install-package').on('click', function(e) { e.stopPropagation(); installDownloadedPackage(this.dataset.slug, this.dataset.type); } );
+            jQuery('.ibx-items-browser .ibx-items .install-button').on('click', installPackage);
+            jQuery('.ibx-items-browser .ibx-items .update-button').on('click', updatePackage);
+            loadPackages('<?php echo $currentTab;?>');
+          });
+        </script>
+      </div> <?php 
+    }
+    public function enqueue_scripts() {
+      // echo "asd-" . self::_get_uri();
+		}
+    public function _get_uri() { // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
+			$path      = wp_normalize_path( dirname( __FILE__ ) );
+			$theme_dir = wp_normalize_path( get_template_directory() );
+
+			if ( strpos( $path, $theme_dir ) !== false ) {
+				return trailingslashit( get_template_directory_uri() . str_replace( $theme_dir, '', $path ) );
+			} else {
+				return plugin_dir_url( __FILE__ );
+			}
+		}
+
+
+    public function getPackages() {
+      $type = isset( $_GET['type'] ) ? sanitize_key( $_GET['type'] ) : 'theme';
+
+      $packages = Iboxindia_WP_Rest_Client::getPackages( $type );
+  
+      wp_send_json( $packages );
+    }
+    public function installPackage() {
+      $slug = sanitize_key( $_POST['slug'] );
+      $type = sanitize_key( $_POST['type'] );
+    
+      if($type == 'theme') {
+        $destination_path = WP_CONTENT_DIR . '/themes';
+        // $up = new Theme_Upgrader();
+      } else if($type == 'plugin') {
+        $destination_path = WP_PLUGIN_DIR;
+        // $up = new Plugin_Upgrader();
       }
+
+      $package_info = Iboxindia_WP_Rest_Client::getPackage($slug);
+      $result = Iboxindia_WP_Rest_Client::get($package_info['data']['download_url']);
+      $filename = $result['data']['asset_name'];
+
+      $uploadPath = Iboxindia_WP_Settings::get( "upload_path" );
+      $file_loc = $uploadPath . '/' . $filename;
+      if( file_exists( $file_loc) ) {
+        WP_Filesystem();
+        $unzipfile = unzip_file( $file_loc, $destination_path );
+      }
+    
+      $resp = [];
+      if ( $unzipfile ) {
+        $resp['raw'] = $unzipfile;
+        $resp['success'] = true;
+        $resp['message'] = 'Successfully installed ' . $slug . ' from [' . $file_loc . '] to [' . $destination_path . ']';
+      } else {
+        $resp['success'] = false;
+        $resp['message'] = 'Failed to install ' . $slug . ' from [' . $file_loc . '] to [' . $destination_path . ']';
+      }
+    
+      wp_send_json($resp);
+    }
+    public function updatePackage() {
+      return $this->installPackage();
+    }
+    function getPackageInfo() {
+      $slug = sanitize_key( $_POST['slug'] );
+      $package_info = Iboxindia_WP_Rest_Client::getPackage($slug);
+
+      $result = Iboxindia_WP_Rest_Client::get($package_info['data']['download_url']);
+
+      $filename = $result['data']['asset_name'];
+      
+      $uploadPath = Iboxindia_WP_Settings::get( "upload_path" );
+      // $package_info['pp']=$uploadPath;
+      // $package_info['klk']=$result;
+      $package_info['fileExists'] = file_exists($uploadPath . '/' . $filename);
+
+      wp_send_json( $package_info );
+    }
+    function downloadPackage() {
+  
+      $timeout = Iboxindia_WP_Settings::get( "timeout" );
+    
+      $slug = sanitize_key( $_POST['slug'] );
+      
+      $package_info = Iboxindia_WP_Rest_Client::getPackage( $slug );
+      // wp_send_json($package_info['data']);
+      $result = Iboxindia_WP_Rest_Client::get( $package_info['data']['download_url'] );
+      // var_dump($result['download_url']);
+      // var_dump($result);
+      $result = $result['data'];
+      // echo "-------------------------------------------------------------------";
+      $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];
+      // var_dump($file_url);
+      // echo "-------------------------------------------------------------------";
+      // //download file in uploads dir
+      // var_dump($uploadPath);
+
+      $result = ibx_wp_download_file($file_url, $result['asset_name'], $timeout);
+      $result['timeout'] = $timeout;
+    
+      // Iboxindia_WP_Settings::set( "download_info", $result );
+    
+      wp_send_json($result);
     }
   }
+  Iboxindia_WP_Dashboard_Page::get_instance();
 endif;
 ?>
