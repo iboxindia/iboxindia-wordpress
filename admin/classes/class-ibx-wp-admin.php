@@ -48,7 +48,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
     private function __construct() {
       add_action( 'admin_init', array( $this, 'init' ) );
       add_action( 'admin_menu', array( $this, 'add_menu' ) );
-      add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_style' ) ); 
+      // add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_style' ) ); 
       add_action( 'admin_notices', array( $this, 'admin_notices' ) );
 
     }
@@ -134,6 +134,7 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
     }
 
     public function enqueue_admin_style( $hook ) {
+      wp_enqueue_style( 'ibx-wp', IBX_WP_PLUGIN_URL . '/assets/css/ibx-admin.css', array(), IBX_WP_PLUGIN_VER );
       wp_enqueue_style( 'ibx-wp-items', IBX_WP_PLUGIN_URL . '/assets/css/ibx-wp-items.css', array(), IBX_WP_PLUGIN_VER );
       wp_enqueue_style( 'materialize-css', '//cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', array(), '1.0.0' );
       wp_enqueue_style( 'materialize-css-icons', '//fonts.googleapis.com/icon?family=Material+Icons' );
@@ -167,16 +168,16 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
     
     public function add_menu() {
 
-      //add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
-      add_menu_page(  IBX_WP_PLUGIN_NAME, 'Iboxindia', 'administrator', IBX_WP_PLUGIN_NAME, [ $this, 'displayPluginAdminDashboard' ], 'dashicons-admin-generic', 55 );
-
-      // if( !empty( $hash ) ) {
+      global $admin_page_hooks;
+      if ( empty ( $admin_page_hooks['iboxindia'] ) ) {
+        $page = add_menu_page( IBX_WP_PLUGIN_NAME, 'Iboxindia', 'administrator', 'iboxindia', [ $this, 'displayIboxindiaOverviewDashboard' ], 'dashicons-admin-generic', 55 );
+        add_action( "admin_print_styles-{$page}", array ($this, 'enqueue_admin_style' ) );
         do_action( 'ibx_wp_admin_menu' );
-      // }
+      }
     }
 
-    public function displayPluginAdminDashboard() {
-      Iboxindia_WP_Dashboard_Page::get_instance()->show();
+    public function displayIboxindiaOverviewDashboard() {
+      echo 'Overview';
     }
 
   }
@@ -184,6 +185,6 @@ if ( ! class_exists( 'Iboxindia_WP_Admin' ) ) :
   /**
    * Kicking this off by calling 'get_instance()' method
    */
-  Iboxindia_WP_Admin::get_instance();
+  $ibx_admin = Iboxindia_WP_Admin::get_instance();
 
 endif;

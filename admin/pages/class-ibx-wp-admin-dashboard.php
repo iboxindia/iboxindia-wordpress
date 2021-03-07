@@ -43,11 +43,17 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
      */
     private function __construct() {
       add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+      add_action( 'ibx_wp_admin_menu', array( $this, 'add_menu' ) );
       add_action( "wp_ajax_iboxindia_packages", array( $this, 'getPackages' ) );
       add_action( "wp_ajax_iboxindia_package_info", array( $this, 'getPackageInfo' ) );
       add_action( "wp_ajax_iboxindia_download_package", array( $this, 'downloadPackage' ) );
       add_action( "wp_ajax_iboxindia_install_package", array( $this, 'installPackage' ) );
       add_action( "wp_ajax_iboxindia_update_package", array( $this, 'updatePackage' ) );
+    }
+    public function add_menu() {
+      $page=add_submenu_page( IBX_WP_PLUGIN_NAME, 'Dashboard', 'Dashboard', 'administrator', IBX_WP_PLUGIN_NAME.'-dashboard', [ $this, 'show' ], 5 );
+      $ibx_admin = Iboxindia_WP_Admin::get_instance();
+      add_action( "admin_print_styles-{$page}", array ($ibx_admin, 'enqueue_admin_style' ) );
     }
 
     public function show() {
@@ -58,26 +64,28 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
         <h2 class="nav-tab-wrapper">
           <?php foreach( $tabs as $tab => $name ) {
             $class = ( $tab == $currentTab ) ? 'nav-tab-active' : '';
-            echo "<a class='nav-tab $class' href='?page=iboxindia&tab=$tab'>$name</a>";
+            echo "<a class='nav-tab $class' href='?page=iboxindia-dashboard&tab=$tab'>$name</a>";
           } ?>
         </h2>
         <div class="ibx-items-browser">
-          <div class="ibx-items wp-clearfix">
-            <div class="ibx-item dummy" tabindex="0" >
-              <div class="ibx-item-screenshot">
-                <div class="ibx-item-version tag"></div>
-                <img src="" alt="" />
-              </div>
-              <div class="update-message notice inline notice-warning notice-alt">
-                <p>
-                  Installed. 
-                </p>
-              </div>
-              <div class="ibx-item-container">
-                <h2 class="ibx-item-name" id=""></h2>
-                <div class="ibx-item-actions">
-                  <button data-target="install-update-dialog" class="btn modal-trigger install-button" type="button">Install</button>
-                  <button data-existing-ver="0" data-current-ver="0" class="button button-primary update-button" type="button">Update</button>
+          <div class="row ibx-items wp-clearfix">
+            <div class="col s4 dummy">
+              <div class="ibx-item">
+                <div class="ibx-item-screenshot">
+                  <div class="ibx-item-version tag"></div>
+                  <img src="" alt="" />
+                </div>
+                <div class="update-message notice inline notice-warning notice-alt">
+                  <p>
+                    Installed. 
+                  </p>
+                </div>
+                <div class="ibx-item-container">
+                  <h2 class="ibx-item-name" id=""></h2>
+                  <div class="ibx-item-actions">
+                    <button data-target="install-update-dialog" class="btn modal-trigger install-button" type="button">Install</button>
+                    <button data-existing-ver="0" data-current-ver="0" class="button button-primary update-button" type="button">Update</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,9 +157,9 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
             jQuery('#install-update-dialog').modal({
               onOpenStart: refreshModalInfo
             });
-            jQuery('#install-update-dialog .refresh-info').on('click', function(e) { e.stopPropagation(); showPackageInfo(this.dataset.slug); } );
-            jQuery('#install-update-dialog .download-package').on('click', function(e) { e.stopPropagation(); downloadPackage(this.dataset.slug); } );
-            jQuery('#install-update-dialog .install-package').on('click', function(e) { e.stopPropagation(); installDownloadedPackage(this.dataset.slug, this.dataset.type); } );
+            jQuery('#install-update-dialog .refresh-info').on('click', function(e) { e.stopPropagation(); showPackageInfo(jQuery(this).attr('data-slug')); } );
+            jQuery('#install-update-dialog .download-package').on('click', function(e) { e.stopPropagation(); downloadPackage(jQuery(this).attr('data-slug')); } );
+            jQuery('#install-update-dialog .install-package').on('click', function(e) { e.stopPropagation(); installDownloadedPackage(jQuery(this).attr('data-slug'), jQuery(this).attr('data-type')); } );
             jQuery('.ibx-items-browser .ibx-items .install-button').on('click', installPackage);
             jQuery('.ibx-items-browser .ibx-items .update-button').on('click', updatePackage);
             loadPackages('<?php echo $currentTab;?>');
@@ -177,8 +185,8 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
     public function getPackages() {
       $type = isset( $_GET['type'] ) ? sanitize_key( $_GET['type'] ) : 'theme';
 
-      $packages = Iboxindia_WP_Rest_Client::getPackages( $type );
-  
+      $packages = Iboxindia_WP_Rest_API::getPackages( $type );
+ 
       wp_send_json( $packages );
     }
     public function installPackage() {
@@ -193,7 +201,7 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
         // $up = new Plugin_Upgrader();
       }
 
-      $package_info = Iboxindia_WP_Rest_Client::getPackage($slug);
+      $package_info = Iboxindia_WP_Rest_API::getPackage($slug);
       $result = Iboxindia_WP_Rest_Client::get($package_info['data']['download_url']);
       $filename = $result['data']['asset_name'];
 
@@ -221,7 +229,7 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
     }
     function getPackageInfo() {
       $slug = sanitize_key( $_POST['slug'] );
-      $package_info = Iboxindia_WP_Rest_Client::getPackage($slug);
+      $package_info = Iboxindia_WP_Rest_API::getPackage($slug);
 
       $result = Iboxindia_WP_Rest_Client::get($package_info['data']['download_url']);
 
@@ -240,7 +248,7 @@ if ( ! class_exists( 'Iboxindia_WP_Dashboard_Page' ) ) :
     
       $slug = sanitize_key( $_POST['slug'] );
       
-      $package_info = Iboxindia_WP_Rest_Client::getPackage( $slug );
+      $package_info = Iboxindia_WP_Rest_API::getPackage( $slug );
       // wp_send_json($package_info['data']);
       $result = Iboxindia_WP_Rest_Client::get( $package_info['data']['download_url'] );
       // var_dump($result['download_url']);

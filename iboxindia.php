@@ -52,6 +52,7 @@ require_once IBX_WP_PLUGIN_DIR . '/admin/ibx-notices/class-ibx-notices.php';
 
 // 
 
+require_once IBX_WP_PLUGIN_DIR . '/includes/class-ibx-wp-rest-client.php';
 require_once IBX_WP_PLUGIN_DIR . '/includes/class-ibx-wp-rest-api.php';
 
 require_once IBX_WP_PLUGIN_DIR . '/admin/pages/class-ibx-wp-admin-dashboard.php';

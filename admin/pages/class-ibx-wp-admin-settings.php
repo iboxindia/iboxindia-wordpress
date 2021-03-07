@@ -48,7 +48,9 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
       
     }
     public function add_menu() {
-      add_submenu_page( IBX_WP_PLUGIN_NAME, 'Iboxindia Settings', 'Settings', 'administrator', IBX_WP_PLUGIN_NAME.'-settings', [ $this, 'show' ] );
+      $page=add_submenu_page( IBX_WP_PLUGIN_NAME, 'Iboxindia Settings', 'Settings', 'administrator', IBX_WP_PLUGIN_NAME.'-settings', [ $this, 'show' ], 10 );
+      $ibx_admin = Iboxindia_WP_Admin::get_instance();
+      add_action( "admin_print_styles-{$page}", array ($ibx_admin, 'enqueue_admin_style' ) );
     }
 
     private function mask ( $str, $start = 0, $length = null ) {
@@ -113,6 +115,7 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
             </button>
           </form>
         </div>
+        <?php do_action( 'add_iboxindia_settings' ); ?>
       </div>
       <?php
     }
@@ -123,7 +126,7 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
 
       $username = $data['username'];
       $password = $data['password'];
-      $resp = Iboxindia_WP_Rest_Client::loginUser( $username, $password );
+      $resp = Iboxindia_WP_Rest_API::loginUser( $username, $password );
       // var_dump($username);
       // var_dump($password);
       // var_dump($data);

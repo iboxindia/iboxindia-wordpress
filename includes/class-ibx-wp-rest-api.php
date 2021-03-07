@@ -6,95 +6,25 @@ if ( ! defined( 'ABSPATH' ) ) {
   exit; // Exit if accessed directly.
 }
 
-if ( ! class_exists( 'Iboxindia_WP_Rest_Client' ) ) :
+if ( ! class_exists( 'Iboxindia_WP_Rest_API' ) ) :
 
 	/**
-	 * Iboxindia_WP_Rest_Client
+	 * Iboxindia_WP_Rest_API
 	 *
 	 * @since 1.4.0
 	 */
-	class Iboxindia_WP_Rest_Client {
+	class Iboxindia_WP_Rest_API {
 
     private static $base_url = 'https://wordpress.iboxindia.com';
 
     public static function getPackages( $type ) {
-      return self::get(self::$base_url . '/packages', [ "type" => $type ]);
+      return Iboxindia_WP_Rest_Client::get(self::$base_url . '/packages', [ "type" => $type ]);
     }
     public static function getPackage( $slug ) {
-      return self::get(self::$base_url . '/packages/' . $slug );
+      return Iboxindia_WP_Rest_Client::get(self::$base_url . '/packages/' . $slug );
     }
     public static function loginUser ($username, $password ) {
-      return self::post(self::$base_url . '/u/login', ["username" => $username, "password" => $password]);
-    }
-    public static function get($uri='', $params=[]) {
-      $debug = Iboxindia_WP_Settings::get( "debug" );
-
-      $params['json']=true;
-      $hash = Iboxindia_WP_Settings::get( "hash" );
-      $url = $uri . '?' . http_build_query($params);
-
-      $args = array(
-        'headers' => array(
-          'domain' => get_site_url(),
-        )
-      );
-      if ( ! empty( $hash ) ) {
-        $args['headers']['Authorization'] = 'Bearer ' . $hash;
-      }
-
-      $http_response = wp_remote_get ( $url, $args );
-      $response = [];
-      if($debug) {
-        $response[ 'url' ] = $url;
-        $response[ 'hash' ] = $hash;
-        $response[ 'http_response' ] = $http_response;
-      }
-
-      return array_merge( $response, self::parseHttpResponse( $http_response ) );
-    }
-
-    public static function post($uri='', $params=[]) {
-      $hash = Iboxindia_WP_Settings::get( "hash" );
-      $url = $uri . '?json';
-      // var_dump(json_encode($params));
-      $args = array(
-        'headers' => array(
-          'domain' => get_site_url(),
-        ),
-        'body'    => json_encode($params)
-      );
-      if ( ! empty( $hash ) ) {
-        $args['headers']['Authorization'] = 'Bearer ' . $hash;
-      }
-
-      // var_dump($args);
-      $http_response = wp_remote_post ( $url, $args );
-
-
-      $response = [];
-      if($debug) {
-        $response[ 'url' ] = $url;
-        $response[ 'hash' ] = $hash;
-        $response[ 'http_response' ] = $http_response;
-      }
-
-      return array_merge( $response, self::parseHttpResponse( $http_response ) );
-    }
-
-    private static function parseHttpResponse($http_response) {
-      if ( is_wp_error( $http_response ) ) {
-        $error_message = $http_response->get_error_message();
-        $response[ 'error' ] = $error_message;
-      } else {
-        $body = wp_remote_retrieve_body( $http_response );
-        $tempResponse = json_decode($body, true);
-        if($tempResponse['statusCode'] == 200) {
-          $response[ 'data' ] = $tempResponse['data'];
-        } else {
-          $response[ 'error' ] = $tempResponse;
-        }
-      }
-      return $response;
+      return Iboxindia_WP_Rest_Client::post(self::$base_url . '/u/login', ["username" => $username, "password" => $password]);
     }
   }
 endif;

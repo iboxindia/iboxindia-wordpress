@@ -44,7 +44,9 @@ if ( ! class_exists( 'Iboxindia_WP_Data_Import_Page' ) ) :
       add_action( 'ibx_wp_admin_menu', array( $this, 'add_menu' ) );
     }
     public function add_menu() {
-      add_submenu_page( IBX_WP_PLUGIN_NAME, 'Import Data', 'Import Data', 'administrator', IBX_WP_PLUGIN_NAME.'-import-data', [ $this, 'show' ] );
+      $page = add_submenu_page( IBX_WP_PLUGIN_NAME, 'Import Data', 'Import Data', 'administrator', IBX_WP_PLUGIN_NAME.'-import-data', [ $this, 'show' ], 15 );
+      $ibx_admin = Iboxindia_WP_Admin::get_instance();
+      add_action( "admin_print_styles-{$page}", array ($ibx_admin, 'enqueue_admin_style' ) );
     }
 
 

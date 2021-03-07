@@ -24,6 +24,7 @@ function reloadPage() {
 }
 jQuery(function($) {
   $('select').formSelect();
+  $('.tabs').tabs();
   $('.ajax-form').on('submit', function(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -187,12 +188,12 @@ function updatePackage() {
 function renderPackages(packages, type) {
   existingItems = iboxindiaConfig.existingItems[type];
   var wrap = jQuery('.ibx-items-browser .ibx-items');
-  var dummyItem = jQuery('.ibx-item.dummy', wrap);
+  var dummyItem = jQuery('.dummy', wrap);
   jQuery.each(packages, function (index, package) {
     var item = dummyItem.clone(true);
     item.removeClass('dummy');
-    item.attr('data-slug', package.slug);
-    item.attr('data-type', package.type);
+    jQuery('.ibx-item', item).attr('data-slug', package.slug);
+    jQuery('.ibx-item', item).attr('data-type', package.type);
     var existingItem = existingItems[package.slug];
     jQuery('.ibx-item-version', item).text(package.latest_version);
     jQuery('img', item).attr('src', package.thumbnail_url);
