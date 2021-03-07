@@ -4,7 +4,7 @@
  * Plugin Name: Iboxindia
  * Plugin URI: https://wordpress.iboxindia.com/
  * Description: Plugin to configure sites for clients of IboxIndia. Kindly contact info@iboxindia.com for more information.
- * Version: 1.0.6
+ * Version: 1.0.7
  * Author: IboxIndia
  * Author URI: https://iboxindia.com
  * Text Domain: iboxindia 
