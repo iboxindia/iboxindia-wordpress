@@ -1,16 +1,10 @@
 <?php
 
-ini_set( 'memory_limit', '5000M' );
-ini_set( 'upload_max_filesize', '3000M');
-ini_set( 'post_max_size', '3000M');
-ini_set( 'max_execution_time', '30000');
-ini_set( 'max_input_time', '3000');
-
 /**
  * Plugin Name: Iboxindia
  * Plugin URI: https://wordpress.iboxindia.com/
  * Description: Plugin to configure sites for clients of IboxIndia. Kindly contact info@iboxindia.com for more information.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: IboxIndia
  * Author URI: https://iboxindia.com
  * Text Domain: iboxindia 
