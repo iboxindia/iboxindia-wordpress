@@ -32,36 +32,36 @@ jobs:
         author=`sed -n 's/^ \* Author: \(.*\)$/\1/p' iboxindia.php`
         echo "AUTHOR=$author" >> $GITHUB_ENV
         
-    - name: Create zip archive
-      run: |
-        /usr/bin/git archive -v -o ${{ env.REPO_NAME }}.zip --worktree-attributes HEAD
-        /usr/bin/unzip ${{ env.REPO_NAME }}.zip -d ${{ env.REPO_NAME }}
-        /bin/rm -rf ${{ env.REPO_NAME }}.zip
-        /bin/rm -rf .github
-        /usr/bin/zip -r ${{ env.REPO_NAME }}.zip ${{ env.REPO_NAME }}
-        echo $VERSION
-    - name: Upload screenshot to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: screenshot.png
-        asset_name: screenshot.png
-        tag: ${{ env.VERSION }}
-        overwrite: true
-        body: "${{ env.ASSET_NAME }} ${{ env.VERSION }}"
+    # - name: Create zip archive
+    #   run: |
+    #     /usr/bin/git archive -v -o ${{ env.REPO_NAME }}.zip --worktree-attributes HEAD
+    #     /usr/bin/unzip ${{ env.REPO_NAME }}.zip -d ${{ env.REPO_NAME }}
+    #     /bin/rm -rf ${{ env.REPO_NAME }}.zip
+    #     /bin/rm -rf .github
+    #     /usr/bin/zip -r ${{ env.REPO_NAME }}.zip ${{ env.REPO_NAME }}
+    #     echo $VERSION
+    # - name: Upload screenshot to release
+    #   uses: svenstaro/upload-release-action@v2
+    #   with:
+    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #     file: screenshot.png
+    #     asset_name: screenshot.png
+    #     tag: ${{ env.VERSION }}
+    #     overwrite: true
+    #     body: "${{ env.ASSET_NAME }} ${{ env.VERSION }}"
         
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{ env.REPO_NAME }}.zip
-        asset_name: ${{ env.REPO_NAME }}-${{ env.VERSION }}.zip
-        tag: ${{ env.VERSION }}
-        overwrite: true
-        body: "${{ env.ASSET_NAME }} ${{ env.VERSION }}"
-    - name: Update the version in database
-      run: |
-        curl  --header "Content-Type: application/json" \
-              --request POST \
-              --data '{"type": "plugin","author": "${{ env.AUTHOR }}","name": "${{ env.ASSET_NAME }}","version": "${{ env.VERSION }}","wp_minimum_version": "5.0.0","wp_tested_version": "5.4.2","php_required_version": "7.0.1","repoType": "github","repoName": "iboxindia-wordpress","repoUrl": "${{ env.REPO_URL }}","repoOwner": "${{ env.REPOSITORY_OWNER }}"}' \
-              https://wordpress.iboxindia.com/updates/${{ env.REPO_NAME }}
+    # - name: Upload binaries to release
+    #   uses: svenstaro/upload-release-action@v2
+    #   with:
+    #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+    #     file: ${{ env.REPO_NAME }}.zip
+    #     asset_name: ${{ env.REPO_NAME }}-${{ env.VERSION }}.zip
+    #     tag: ${{ env.VERSION }}
+    #     overwrite: true
+    #     body: "${{ env.ASSET_NAME }} ${{ env.VERSION }}"
+    # - name: Update the version in database
+    #   run: |
+    #     curl  --header "Content-Type: application/json" \
+    #           --request POST \
+    #           --data '{"type": "plugin","author": "${{ env.AUTHOR }}","name": "${{ env.ASSET_NAME }}","version": "${{ env.VERSION }}","wp_minimum_version": "5.0.0","wp_tested_version": "5.4.2","php_required_version": "7.0.1","repoType": "github","repoName": "iboxindia-wordpress","repoUrl": "${{ env.REPO_URL }}","repoOwner": "${{ env.REPOSITORY_OWNER }}"}' \
+    #           https://wordpress.iboxindia.com/updates/${{ env.REPO_NAME }}

@@ -24,138 +24,84 @@ function ibx_wp_get_request_uri() {
 	return esc_url_raw( $request_uri );
 }
 
-function ibx_wp_postman_get($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
-  $params['json']=true;
-  $settings = IBX_WP::get_option( "settings" );
-  $url = $base_url . $uri . '?' . http_build_query($params);
+add_action("wp_ajax_ibx_wp_get_package_info", "ibx_wp_get_package_info");
+function ibx_wp_get_package_info() {
+  $hash = Iboxindia_WP_Settings::get( "hash" );
 
-  $args = array(
-    'headers' => array(
-      'domain' => get_site_url(),
-    )
-  );
-  if ( ! empty( $settings['hash'] ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
-  }
-
-  $response = wp_remote_get ( $url, $args );
-  if ( is_wp_error( $response ) ) {
-    $error_message = $response->get_error_message();
-    $response = array(
-      'error' => $error_message
-    );
-  } else {
-    $body = wp_remote_retrieve_body( $response );
-    $tempResponse = json_decode($body, true);
-    if($tempResponse['statusCode'] == 200) {
-      $response = $tempResponse['data'];
-    } else {
-      $response = array(
-        'error' => $tempResponse
-      );
-    }
-  }
-  if( isset( $response['error'] ) ) { return false; }
-  return $response;
-}
-function ibx_wp_postman_post($uri='', $params=[], $base_url='https://wordpress.iboxindia.com') {
-  // $params['json']=true;
-  $settings = IBX_WP::get_option( "settings" );
-  $url = $base_url . $uri . '?json';
-  // var_dump(json_encode($params));
-  $args = array(
-    'headers' => array(
-      'domain' => get_site_url(),
-    ),
-    'body'    => json_encode($params)
-  );
-  if ( ! empty( $settings['hash'] ) ) {
-    $args['headers']['Authorization'] = 'Bearer ' . $settings['hash'];
-  }
-
-  // var_dump($args);
-  $response = wp_remote_post ( $url, $args );
-  // var_dump($response);
-  if ( is_wp_error( $response ) ) {
-    $error_message = $response->get_error_message();
-    $response = array(
-      'error' => $error_message
-    );
-  } else {
-    $body = wp_remote_retrieve_body( $response );
-    $tempResponse = json_decode($body, true);
-    if($tempResponse['statusCode'] == 200) {
-      $response = $tempResponse['data'];
-    } else {
-      $response = array(
-        'error' => $tempResponse
-      );
-    }
-  }
-  if( isset( $response['error'] ) ) { return false; }
-  return $response;
-}
-// add_action("wp_ajax_ibx_wp_download", "ibx_wp_download");
-
-function ibx_wp_download() { 
-  
-  $settings = IBX_WP::get_option( "settings" );
-  if ( ! current_user_can( 'install_themes' ) ) {
-    exit( __( 'Sorry, you are not allowed to install themes on this site.' ) );
-  }
-  include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-  $slug = sanitize_key( $_GET['slug'] );
-  if ( !wp_verify_nonce( $_GET['nonce'], $slug)) {
+  $slug = sanitize_key( $_POST['slug'] );
+  if ( !wp_verify_nonce( $_POST['nonce'], $slug)) {
     exit( __( 'No naughty business please.' ) );
   }
 
-  $package_info = ibx_wp_postman_get('/packages/' . $slug);
-  // var_dump($package_info);
-  $result = ibx_wp_postman_get($package_info['download_url'], [],'');
+  $package_info = Iboxindia_WP_Rest_Client::get('/packages/' . $slug);
 
-  $file_url = $result['http_scheme'] . '://' . ( $result['auth_key'] ? ( $result['auth_key'] . '@' ) : '' ) . $result['asset_url'];
+  $result = Iboxindia_WP_Rest_Client::get($package_info['download_url'], [],'');
 
-  // //download file in uploads dir
-  $result = ibx_wp_download_file($file_url, $result['asset_name'], $settings['timeout']);
+  Iboxindia_WP_Settings::set( "package_info", $result);
 
-  if( $settings['debug'] ) {
-    echo '<hr />';
-    echo '<pre>';
-    var_dump($package_info);
-    echo '</pre>';
-    echo '<hr />';
-    echo '<pre>';
-    var_dump($result);
-    echo '</pre>';
-    echo '<hr />';
+  wp_send_json( $package_info );
+  // wp_send_json($result);
+}
+
+add_action("wp_ajax_ibx_wp_download_package", "ibx_wp_download_package");
+function ibx_wp_download_package() {
+  
+  $timeout = Iboxindia_WP_Settings::get( "settings" );
+  if ( ! current_user_can( 'install_themes' ) ) {
+    wp_send_json( __( 'Sorry, you are not allowed to install themes on this site.' ) );
   }
 
-  if($package_info['type'] == 'theme') {
+  $slug = sanitize_key( $_POST['slug'] );
+  if ( !wp_verify_nonce( $_POST['nonce'], $slug ) ) {
+    wp_send_json( __( 'No naughty business please.' ) );
+  }
+
+  $package_info = Iboxindia_WP_Settings::get( "package_info" );
+  // wp_send_json($package_info);
+
+  $file_url = $package_info['http_scheme'] . '://' . ( $package_info['auth_key'] ? ( $package_info['auth_key'] . '@' ) : '' ) . $package_info['asset_url'];
+
+  // //download file in uploads dir
+  $result = ibx_wp_download_file($file_url, $package_info['asset_name'], $timeout);
+
+  Iboxindia_WP_Settings::set( "download_info", $result );
+
+  wp_send_json($result);
+}
+add_action("wp_ajax_ibx_wp_install_package", "ibx_wp_install_package");
+function ibx_wp_install_package() {
+  $package_info = Iboxindia_WP_Settings::get( "package_info" );
+  $download_info = Iboxindia_WP_Settings::get( "download_info" );
+
+  $slug = sanitize_key( $_POST['slug'] );
+  if ( !wp_verify_nonce( $_POST['nonce'], $slug)) {
+    wp_send_json( __( 'No naughty business please.' ) );
+  }
+
+  $type = $package_info['type'];
+  $asset = $download_info['asset']['data']['file'];
+
+  if($type == 'theme') {
     $destination_path = WP_CONTENT_DIR . '/themes';
     // $up = new Theme_Upgrader();
-  } else if($package_info['type'] == 'plugin') {
+  } else if($type == 'plugin') {
     $destination_path = WP_PLUGIN_DIR;
     // $up = new Plugin_Upgrader();
   }
 
+  // $file_loc = wp_upload_dir() . '' . $asset;
   WP_Filesystem();
-  $unzipfile = unzip_file( $result['data']['file'], $destination_path);
-    
+  $unzipfile = unzip_file( $file_loc, $destination_path);
+
+  $resp = [];
   if ( $unzipfile ) {
-    echo 'Successfully installed ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
+    $resp['success'] = true;
+    $resp['message'] = 'Successfully installed ' . $slug . ' from [' . $asset . '] to [' . $destination_path . ']';
   } else {
-    echo 'Failed to install ' . $package_info['slug'] . ' from [' . $result['data']['file'] . '] to [' . $destination_path . ']';
+    $resp['success'] = false;
+    $resp['message'] = 'Failed to install ' . $slug . ' from [' . $asset . '] to [' . $destination_path . ']';
   }
 
-  // if( isset( $result['data']['file'] ) )
-  //   $up->install( $result['data']['file'] );
-  // extract file
-
-
-  // $result = json_encode($result['data']['file']);
-  // echo $result;
-
-  return $package_info;
+  wp_send_json($resp);
 
 }

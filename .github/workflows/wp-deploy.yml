@@ -16,11 +16,11 @@ jobs:
       
       - name: Create zip archive
         run: |
-          /usr/bin/git archive -v -o iboxindia.zip --worktree-attributes HEAD
-          /usr/bin/unzip iboxindia.zip -d iboxindia
-          /bin/rm -rf iboxindia.zip
-          /bin/rm -rf .github
-          /usr/bin/zip -r iboxindia.zip iboxindia
+          # /usr/bin/git archive -v -o iboxindia.zip --worktree-attributes HEAD
+          # /usr/bin/unzip iboxindia.zip -d iboxindia
+          # /bin/rm -rf iboxindia.zip
+          # /bin/rm -rf .github
+          # /usr/bin/zip -r iboxindia.zip iboxindia
 
       - name: WordPress Plugin Deploy
         uses: nk-o/action-wordpress-plugin-deploy@master

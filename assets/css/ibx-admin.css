@@ -1,0 +1,37 @@
+.p-10 {
+  padding: 10px;
+}
+.m-t-5 {
+  margin-top: 5px;
+}
+.m-tb-5 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.m-tb-10 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.tab-content {
+  padding: 10px;
+}
+input[type=checkbox].disabled, input[type=checkbox].disabled:checked:before, input[type=checkbox]:disabled, input[type=checkbox]:disabled:checked:before, input[type=radio].disabled, input[type=radio].disabled:checked:before, input[type=radio]:disabled, input[type=radio]:disabled:checked:before {
+  opacity: 0;
+}
+.tabs:after {
+  background-color: #fff5f5;
+  position: absolute;
+  width: 100%;
+  display: block;
+  content: " ";
+  bottom: 0;
+  height: 2px;
+  margin-bottom: 6px;
+  z-index: 0;
+}
+.tabs .indicator {
+  z-index: 1;
+}
+.tabs .tab a {
+  outline: none;
+}

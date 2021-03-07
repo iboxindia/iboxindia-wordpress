@@ -19,7 +19,7 @@
 
 function ibx_wp_custom_file_download( $url, $timeout = 300 ) {
   
-  $settings = IBX_WP::get_option( "settings" );
+  // $settings = IBX_WP::get_option( "settings" );
   // Gives us access to the download_url() and wp_handle_sideload() functions.
   require_once( ABSPATH . 'wp-admin/includes/file.php' );
   
@@ -134,7 +134,13 @@ function ibx_wp_download_file ( $file_url, $file_name, $timeout_seconds ) {
   );
 
   // Move the temporary file into the uploads directory.
-  $results = wp_handle_sideload( $file_args, $overrides );
+  // var_dump($file_name);
+  $uploadPath = Iboxindia_WP_Settings::get( "upload_path" );
+  // var_dump($uploadPath);
+  $move_new_file = @copy( $temp_file, $uploadPath . '/' . $file_name );
+  unlink( $temp_file );
+  // move_uploaded_file( $temp_file, $uploadPath . '/' . $file_name );
+  // $results = wp_handle_sideload( $file_args, $overrides );
 
   // echo '<pre>';
   // print_r($results);
@@ -150,6 +156,6 @@ function ibx_wp_download_file ( $file_url, $file_name, $timeout_seconds ) {
   // Success!
   return array(
     'success' => true,
-    'data'    => $results,
+    'data'    => $move_new_file,
   );
 }
