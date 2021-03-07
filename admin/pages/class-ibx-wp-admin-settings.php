@@ -124,8 +124,8 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
       parse_str ( $json, $data );
       // $data = json_decode($json, true);
 
-      $username = $data['username'];
-      $password = $data['password'];
+      $username = sanitize_key( $data['username'] );
+      $password = sanitize_key( $data['password'] );
       $resp = Iboxindia_WP_Rest_API::loginUser( $username, $password );
       // var_dump($username);
       // var_dump($password);
@@ -133,7 +133,7 @@ if ( ! class_exists( 'Iboxindia_WP_Settings_Page' ) ) :
       // var_dump($data);
       // var_dump($resp);
       if( $resp['data']['code'] == 200 ) {
-        Iboxindia_WP_Settings::set( "hash", $resp['data']['jwt'] );
+        Iboxindia_WP_Settings::set( "hash", $resp['data']['access_token'] );
         wp_send_json ( ['data' => [ "logged_in" => true ] ] );
       } else {
         wp_send_json ( $resp['data'] );
